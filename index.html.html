@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PCP Mestre</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D1117;--bg2:#161B22;--bg3:#1C2330;--border:#30363D;--text:#E6EDF3;--text2:#8B949E;--text3:#6E7681;--accent:#F0B429;--accent2:#E8A016;--green:#2EA043;--green-bg:#0D2F1A;--red:#F85149;--red-bg:#2D0F0F;--blue:#58A6FF;--blue-bg:#0D1F3C;--radius:12px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;overscroll-behavior:none}
+.home{display:flex;flex-direction:column;min-height:100vh}
+.home-header{background:linear-gradient(135deg,#1A2332 0%,#0D1117 60%);padding:40px 24px 32px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.home-header::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(240,180,41,0.12) 0%,transparent 70%)}
+.home-logo{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.home-logo-icon{width:44px;height:44px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.home-logo-text{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.5px}
+.home-logo-sub{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:1px}
+.home-date{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);padding:6px 12px;border-radius:20px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:10px}
+.home-date span{color:var(--accent);font-weight:500}
+.sync-status{display:flex;align-items:center;gap:6px;font-size:11px;font-family:'DM Mono',monospace}
+.sync-dot{width:7px;height:7px;border-radius:50%}
+.sync-dot.ok{background:#2EA043}
+.sync-dot.warn{background:#F0B429}
+.sync-dot.err{background:#F85149}
+.setores-grid{padding:20px 16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1}
+.setor-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px 16px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;min-height:120px;-webkit-user-select:none;user-select:none}
+.setor-card:active{transform:scale(.97);background:var(--bg3)}
+.setor-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 var(--radius) var(--radius);background:var(--card-color)}
+.setor-icon{font-size:28px}
+.setor-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.setor-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.setor-badge{position:absolute;top:10px;right:10px;background:var(--card-color);color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;font-family:'DM Mono',monospace}
+.setor-card.poly{--card-color:#58A6FF}
+.setor-card.fibra{--card-color:#3FB950}
+.setor-card.pt{--card-color:#D2A8FF}
+.setor-card.micro{--card-color:#F0B429}
+.setor-card.gas{--card-color:#FF7B72}
+.setor-card.carga{--card-color:#79C0FF}
+.form-screen{display:none;flex-direction:column;min-height:100vh}
+.form-screen.active{display:flex}
+.form-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
+.back-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.form-header-info{flex:1}
+.form-title{font-size:15px;font-weight:600;color:var(--text)}
+.form-subtitle{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:2px}
+.form-accent-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.form-body{flex:1;padding:16px;overflow-y:auto;padding-bottom:100px}
+.form-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.form-section-title{padding:12px 16px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;background:var(--bg3);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace}
+.field{padding:12px 16px;border-bottom:1px solid var(--border)}
+.field:last-child{border-bottom:none}
+.field-label{font-size:12px;color:var(--text2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.field-label span{font-family:'DM Mono',monospace;color:var(--accent);font-size:11px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Sora',sans-serif;font-size:15px;padding:12px 14px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(240,180,41,.12)}
+.field input[type=number]{font-family:'DM Mono',monospace;font-size:18px;font-weight:500}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B949E' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.field textarea{resize:none;height:80px;font-size:14px}
+.seg-ctrl{display:flex;gap:6px;flex-wrap:wrap}
+.seg-btn{flex:1;min-width:60px;padding:10px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'DM Mono',monospace;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all .15s}
+.seg-btn.on{background:var(--accent);color:#000;border-color:var(--accent)}
+.num-row{display:flex;align-items:center;gap:10px}
+.num-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.num-btn:active{background:var(--accent);color:#000;border-color:var(--accent)}
+.num-input{flex:1;text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Mono',monospace;font-size:28px;font-weight:700;padding:10px;outline:none}
+.num-input:focus{border-color:var(--accent)}
+.moldes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.molde-item{text-align:center}
+.molde-label{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:4px}
+.molde-input{width:100%;text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--accent);font-family:'DM Mono',monospace;font-size:20px;font-weight:700;padding:10px 4px;outline:none}
+.molde-input:focus{border-color:var(--accent)}
+.calc-result{background:var(--blue-bg);border:1px solid rgba(88,166,255,.3);border-radius:var(--radius-sm);padding:12px 14px;font-family:'DM Mono',monospace}
+.calc-result-title{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.calc-result-row{display:flex;justify-content:space-between;font-size:13px;color:var(--text);padding:2px 0}
+.calc-result-row strong{color:var(--blue)}
+.tank-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px}
+.tank-item{background:var(--bg3);border-radius:10px;padding:12px;text-align:center}
+.tank-name{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:8px}
+.tank-slider{width:100%;accent-color:var(--accent);margin-bottom:6px}
+.tank-pct{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
+.tank-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:6px}
+.tank-fill{height:100%;border-radius:3px;transition:width .3s}
+.submit-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:16px;z-index:200}
+.submit-btn{width:100%;padding:16px;border-radius:var(--radius);border:none;background:var(--accent);color:#000;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.02em;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.submit-btn:active{transform:scale(.98);background:var(--accent2)}
+.submit-btn:disabled{background:var(--bg3);color:var(--text3);cursor:not-allowed}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);padding:12px 24px;border-radius:30px;font-size:14px;font-weight:600;z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#2EA043;color:#fff}
+.toast.err{background:#F85149;color:#fff}
+.toast.send{background:#25D366;color:#fff}
+.home-actions{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px}
+.action-btn{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.action-btn.wpp{background:#25D366;color:#fff;border-color:#25D366;font-weight:600}
+.config-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:0 16px 12px}
+.config-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.config-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:10px 12px;outline:none;margin-bottom:8px}
+.config-input:focus{border-color:var(--accent)}
+.config-hint{font-size:11px;color:var(--text2);line-height:1.5;margin-top:4px}
+.config-hint a{color:var(--blue)}
+.saved-list{padding:0 16px 20px}
+.saved-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.saved-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.saved-item-title{font-size:13px;font-weight:600}
+.saved-item-time{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.saved-item-body{font-size:12px;color:var(--text2);line-height:1.6}
+.saved-item-status{font-size:10px;font-family:'DM Mono',monospace;margin-top:4px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="home" id="home">
+  <div class="home-header">
+    <div class="home-logo">
+      <div class="home-logo-icon">⚙️</div>
+      <div>
+        <div class="home-logo-text">PCP Mestre</div>
+        <div class="home-logo-sub">REGISTRO DE PRODUÇÃO</div>
+      </div>
+    </div>
+    <div class="home-date">📅 <span id="hoje"></span></div>
+    <div class="sync-status" id="sync-status">
+      <div class="sync-dot warn" id="sync-dot"></div>
+      <span id="sync-text" style="font-size:11px;color:var(--text2)">Configure o Sheets abaixo</span>
+    </div>
+  </div>
+
+  <!-- CONFIG GOOGLE SHEETS -->
+  <div class="config-panel" id="config-panel">
+    <div class="config-title">🔗 Conexão com Google Sheets</div>
+    <input class="config-input" id="sheets-url" placeholder="Cole aqui a URL do Apps Script (ver instruções)" type="url">
+    <input class="config-input" id="wpp-numero" placeholder="WhatsApp supervisor com DDD: 5571999999999" type="tel">
+    <button style="width:100%;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;cursor:pointer" onclick="salvarConfig()">💾 Salvar configuração</button>
+    <div class="config-hint" id="config-hint-text">
+      ⚠️ URL não configurada — registros ficam apenas no celular.<br>
+      <a href="#" onclick="openInstrucoes()">📖 Ver instruções de configuração</a>
+    </div>
+  </div>
+
+  <div class="setores-grid">
+    <div class="setor-card poly" onclick="openForm('poly')">
+      <div class="setor-badge" id="badge-poly">0</div>
+      <div class="setor-icon">📦</div>
+      <div class="setor-name">Polietileno</div>
+      <div class="setor-sub">3 turnos · MaxFort · KEP</div>
+    </div>
+    <div class="setor-card fibra" onclick="openForm('fibra')">
+      <div class="setor-badge" id="badge-fibra">0</div>
+      <div class="setor-icon">🏗️</div>
+      <div class="setor-name">Fibra</div>
+      <div class="setor-sub">Cx completa · Tampa · Multiuso</div>
+    </div>
+    <div class="setor-card pt" onclick="openForm('pt')">
+      <div class="setor-badge" id="badge-pt">0</div>
+      <div class="setor-icon">🚿</div>
+      <div class="setor-name">Pias e Tanques</div>
+      <div class="setor-sub">4 cores · Equipes</div>
+    </div>
+    <div class="setor-card micro" onclick="openForm('micro')">
+      <div class="setor-badge" id="badge-micro">0</div>
+      <div class="setor-icon">⚡</div>
+      <div class="setor-name">Micronizador</div>
+      <div class="setor-sub">Vazão · Projeção</div>
+    </div>
+    <div class="setor-card gas" onclick="openForm('gas')">
+      <div class="setor-badge" id="badge-gas">0</div>
+      <div class="setor-icon">🔥</div>
+      <div class="setor-name">Central de Gás</div>
+      <div class="setor-sub">4 tanques</div>
+    </div>
+    <div class="setor-card carga" onclick="openForm('carga')">
+      <div class="setor-badge" id="badge-carga">0</div>
+      <div class="setor-icon">🚛</div>
+      <div class="setor-name">Carregamento</div>
+      <div class="setor-sub">13 veículos · Frota</div>
+    </div>
+  </div>
+
+  <div class="home-actions">
+    <button class="action-btn wpp" onclick="enviarWhatsApp()">📱 Enviar resumo do dia via WhatsApp</button>
+    <button class="action-btn" onclick="openForm('saved')">📋 Ver registros salvos hoje (<span id="saved-count">0</span>)</button>
+    <button class="action-btn" onclick="reenviarPendentes()" id="btn-reenviar" style="display:none">🔄 Reenviar ao Sheets (<span id="pendentes-count">0</span> pendentes)</button>
+  </div>
+</div>
+
+<!-- INSTRUÇÕES -->
+<div class="form-screen" id="form-instrucoes">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="form-header-info">
+      <div class="form-title">Como configurar o Google Sheets</div>
+      <div class="form-subtitle">PASSO A PASSO</div>
+    </div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Passo 1 — Criar a planilha</div>
+      <div class="field"><div style="font-size:13px;color:var(--text);line-height:1.8">
+        1. Acesse <strong>sheets.google.com</strong><br>
+        2. Crie uma planilha nova<br>
+        3. Renomeie para <strong>PCP Registros</strong><br>
+        4. Crie estas abas (clicando no + no rodapé):<br>
+        &nbsp;&nbsp;• <strong>Polietileno</strong><br>
+        &nbsp;&nbsp;• <strong>Fibra</strong><br>
+        &nbsp;&nbsp;• <strong>Pias_Tanques</strong><br>
+        &nbsp;&nbsp;• <strong>Micronizador</strong><br>
+        &nbsp;&nbsp;• <strong>Gas</strong><br>
+        &nbsp;&nbsp;• <strong>Carregamento</strong>
+      </div></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Passo 2 — Criar o Apps Script</div>
+      <div class="field"><div style="font-size:13px;color:var(--text);line-height:1.8">
+        1. Na planilha, clique em <strong>Extensões → Apps Script</strong><br>
+        2. Apague o código que aparece<br>
+        3. Cole o código abaixo (toque para copiar)
+      </div></div>
+      <div class="field">
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;font-family:'DM Mono',monospace;font-size:11px;color:#8B949E;line-height:1.6;cursor:pointer" onclick="copyScript()">
+          <div style="color:var(--accent);margin-bottom:6px;font-size:12px">▶ Toque para copiar o código</div>
+          <div id="script-preview">function doPost(e){try{var d=JSON.parse(e.postData.contents);var ss=SpreadsheetApp.getActiveSpreadsheet();var sh=ss.getSheetByName(d.setor)||ss.insertSheet(d.setor);var keys=Object.keys(d);if(sh.getLastRow()===0){sh.appendRow(keys);}sh.appendRow(keys.map(function(k){return d[k];}));return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);}catch(err){return ContentService.createTextOutput(JSON.stringify({ok:false,error:err.toString()})).setMimeType(ContentService.MimeType.JSON);}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Passo 3 — Publicar o script</div>
+      <div class="field"><div style="font-size:13px;color:var(--text);line-height:1.8">
+        1. Clique em <strong>Implantar → Nova implantação</strong><br>
+        2. Em "Tipo", selecione <strong>App da Web</strong><br>
+        3. Em "Executar como", selecione <strong>Eu</strong><br>
+        4. Em "Quem tem acesso", selecione <strong>Qualquer pessoa</strong><br>
+        5. Clique <strong>Implantar</strong><br>
+        6. Autorize quando pedir permissão<br>
+        7. <strong>Copie a URL</strong> que aparece no final
+      </div></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Passo 4 — Colar a URL no app</div>
+      <div class="field"><div style="font-size:13px;color:var(--text);line-height:1.8">
+        1. Volte para esta tela inicial<br>
+        2. Cole a URL no campo <strong>"Conexão com Google Sheets"</strong><br>
+        3. Clique <strong>Salvar configuração</strong><br>
+        4. O indicador ficará <span style="color:#2EA043">verde</span> ✅<br><br>
+        A partir daí, cada registro enviado pelos encarregados aparece <strong>instantaneamente</strong> na sua planilha!
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- POLIETILENO -->
+<div class="form-screen" id="form-poly">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="form-header-info"><div class="form-title">Polietileno</div><div class="form-subtitle">REGISTRO POR TURNO</div></div>
+    <div class="form-accent-dot" style="background:#58A6FF"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Identificação</div>
+      <div class="field"><div class="field-label">Turno</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'poly-turno','Diurno')">Diurno</div>
+          <div class="seg-btn" onclick="seg(this,'poly-turno','Vespertino')">Vespertino</div>
+          <div class="seg-btn" onclick="seg(this,'poly-turno','Noturno')">Noturno</div>
+        </div><input type="hidden" id="poly-turno" value="Diurno">
+      </div>
+      <div class="field"><div class="field-label">Máquina</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'poly-maq','MaxFort')">MaxFort</div>
+          <div class="seg-btn" onclick="seg(this,'poly-maq','KEP')">KEP</div>
+        </div><input type="hidden" id="poly-maq" value="MaxFort">
+      </div>
+      <div class="field"><div class="field-label">Carro</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'poly-carro','Carro 1')">Carro 1</div>
+          <div class="seg-btn" onclick="seg(this,'poly-carro','Carro 2')">Carro 2</div>
+        </div><input type="hidden" id="poly-carro" value="Carro 1">
+      </div>
+      <div class="field"><div class="field-label">Operador</div><input type="text" id="poly-op" placeholder="Nome do operador"></div>
+      <div class="field"><div class="field-label">Equipe</div><input type="text" id="poly-equipe" placeholder="Ex: Equipe A"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Moldes configurados neste carro</div>
+      <div class="field">
+        <div class="field-label">Quantidade de moldes por tamanho <span>setup atual</span></div>
+        <div class="moldes-grid">
+          <div class="molde-item"><div class="molde-label">310L</div><input class="molde-input" type="number" id="mol-310" value="0" min="0" oninput="calcPoly()"></div>
+          <div class="molde-item"><div class="molde-label">500L</div><input class="molde-input" type="number" id="mol-500" value="0" min="0" oninput="calcPoly()"></div>
+          <div class="molde-item"><div class="molde-label">1.000L</div><input class="molde-input" type="number" id="mol-1k" value="0" min="0" oninput="calcPoly()"></div>
+          <div class="molde-item"><div class="molde-label">2.000L</div><input class="molde-input" type="number" id="mol-2k" value="0" min="0" oninput="calcPoly()"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Produção</div>
+      <div class="field"><div class="field-label">Número de ciclos no turno</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-ciclos',-1)">−</button>
+          <input class="num-input" type="number" id="poly-ciclos" value="0" min="0" oninput="calcPoly()">
+          <button class="num-btn" onclick="adj('poly-ciclos',1)">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="calc-result">
+          <div class="calc-result-title">Caixas produzidas (calculado automático)</div>
+          <div class="calc-result-row"><span>310L</span><strong id="res-310">0 cx</strong></div>
+          <div class="calc-result-row"><span>500L</span><strong id="res-500">0 cx</strong></div>
+          <div class="calc-result-row"><span>1.000L</span><strong id="res-1k">0 cx</strong></div>
+          <div class="calc-result-row"><span>2.000L</span><strong id="res-2k">0 cx</strong></div>
+          <div class="calc-result-row" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(88,166,255,.2)"><span>Total</span><strong id="res-tot" style="font-size:16px">0 cx</strong></div>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Na pintura (caixas)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-pint',-1)">−</button>
+          <input class="num-input" type="number" id="poly-pint" value="0" min="0">
+          <button class="num-btn" onclick="adj('poly-pint',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Material usado (kg)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-mat',-5)">−</button>
+          <input class="num-input" type="number" id="poly-mat" value="0" min="0">
+          <button class="num-btn" onclick="adj('poly-mat',5)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Desperdício (kg)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-desp',-1)">−</button>
+          <input class="num-input" type="number" id="poly-desp" value="0" min="0">
+          <button class="num-btn" onclick="adj('poly-desp',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Meta do turno (caixas)</div><input type="number" id="poly-meta" value="56"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="poly-obs" placeholder="Paradas, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-poly" onclick="salvar('poly')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- FIBRA -->
+<div class="form-screen" id="form-fibra">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="form-header-info"><div class="form-title">Fibra</div><div class="form-subtitle">REGISTRO DE PRODUÇÃO</div></div>
+    <div class="form-accent-dot" style="background:#3FB950"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Identificação</div>
+      <div class="field"><div class="field-label">Turno</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'fibra-turno','Diurno')">Diurno</div>
+          <div class="seg-btn" onclick="seg(this,'fibra-turno','Vespertino')">Vespertino</div>
+        </div><input type="hidden" id="fibra-turno" value="Diurno">
+      </div>
+      <div class="field"><div class="field-label">Equipe</div><input type="text" id="fibra-equipe" placeholder="Ex: Equipe C"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Produtos com tampa</div>
+      <div class="field"><div class="field-label">Produto</div>
+        <select id="fibra-prod">
+          <option value="">— selecione —</option>
+          <option>Cx 250L</option><option>Cx 500L</option>
+          <option>Cx 1.000L Mod.Alta</option><option>Cx 1.000L Mod.Baixa</option>
+          <option>Cx 2.000L Mod.Alta</option><option>Cx 2.000L Mod.Baixa</option>
+          <option>Cx 5.000L</option><option>Cx 10.000L</option>
+          <option>Cx 12.000L</option><option>Cx 15.000L</option><option>Cx 20.000L</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Tipo</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'fibra-tipo','Caixa Completa')">Caixa Completa</div>
+          <div class="seg-btn" onclick="seg(this,'fibra-tipo','Somente Tampa')">Somente Tampa</div>
+        </div><input type="hidden" id="fibra-tipo" value="Caixa Completa">
+      </div>
+      <div class="field"><div class="field-label">Quantidade produzida</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('fibra-qtd',-1)">−</button>
+          <input class="num-input" type="number" id="fibra-qtd" value="0" min="0">
+          <button class="num-btn" onclick="adj('fibra-qtd',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Na pintura</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('fibra-pint',-1)">−</button>
+          <input class="num-input" type="number" id="fibra-pint" value="0" min="0">
+          <button class="num-btn" onclick="adj('fibra-pint',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Multiuso — sem tampa</div>
+      <div class="field"><div class="field-label">Produto Multiuso</div>
+        <select id="fibra-multi">
+          <option value="">— nenhum —</option>
+          <option>Cx 1.000L Multiuso</option><option>Cx 2.000L Multiuso</option><option>Cx 3.000L Multiuso</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Quantidade Multiuso</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('fibra-muli',-1)">−</button>
+          <input class="num-input" type="number" id="fibra-muli" value="0" min="0">
+          <button class="num-btn" onclick="adj('fibra-muli',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Matérias-primas usadas</div>
+      <div class="field"><div class="field-label">Resina (kg)</div><input type="number" id="fb-resina" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Roving (kg)</div><input type="number" id="fb-roving" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Catalisador (L)</div><input type="number" id="fb-catal" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Gel Coat (L)</div><input type="number" id="fb-gel" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Estireno (L)</div><input type="number" id="fb-est" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Carbonato (kg)</div><input type="number" id="fb-carb" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Desperdício total (kg)</div><input type="number" id="fb-desp" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="fibra-obs" placeholder="Paradas, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-fibra" onclick="salvar('fibra')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- PIAS E TANQUES -->
+<div class="form-screen" id="form-pt">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="form-header-info"><div class="form-title">Pias e Tanques</div><div class="form-subtitle">REGISTRO DE PRODUÇÃO</div></div>
+    <div class="form-accent-dot" style="background:#D2A8FF"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Identificação</div>
+      <div class="field"><div class="field-label">Turno</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'pt-turno','Diurno')">Diurno</div>
+          <div class="seg-btn" onclick="seg(this,'pt-turno','Vespertino')">Vespertino</div>
+          <div class="seg-btn" onclick="seg(this,'pt-turno','Noturno')">Noturno</div>
+        </div><input type="hidden" id="pt-turno" value="Diurno">
+      </div>
+      <div class="field"><div class="field-label">Equipe</div><input type="text" id="pt-equipe" placeholder="Ex: Equipe D"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Produto</div>
+      <div class="field"><div class="field-label">Modelo</div>
+        <select id="pt-prod">
+          <option value="">— selecione —</option>
+          <optgroup label="Cubas"><option>Cuba 60x60</option></optgroup>
+          <optgroup label="Pias"><option>Pia 85x50</option><option>Pia 100x50</option><option>Pia 120x50</option><option>Pia 140x50</option></optgroup>
+          <optgroup label="Tanque Duplo"><option>Tanque Duplo 100x50</option><option>Tanque Duplo 110x55</option><option>Tanque Duplo 120x60</option><option>Tanque Duplo 140x70</option><option>Tanque Duplo 160x70</option></optgroup>
+          <optgroup label="Tanque Triplo"><option>Tanque Triplo 140x50</option><option>Tanque Triplo 160x54</option><option>Tanque Triplo 180x70</option></optgroup>
+          <optgroup label="Tanque Bojo"><option>Tanque Bojo 100x50</option></optgroup>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Cor</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'pt-cor','Branco')" style="background:#f0f0f0;color:#000;border-color:#ddd">Branco</div>
+          <div class="seg-btn" onclick="seg(this,'pt-cor','Bege')" style="background:#c8a882;color:#fff;border-color:#c8a882">Bege</div>
+          <div class="seg-btn" onclick="seg(this,'pt-cor','Cinza')" style="background:#888;color:#fff;border-color:#888">Cinza</div>
+          <div class="seg-btn" onclick="seg(this,'pt-cor','Preto')" style="background:#222;color:#fff;border-color:#444">Preto</div>
+        </div><input type="hidden" id="pt-cor" value="Branco">
+      </div>
+      <div class="field"><div class="field-label">Quantidade produzida</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('pt-qtd',-1)">−</button>
+          <input class="num-input" type="number" id="pt-qtd" value="0" min="0">
+          <button class="num-btn" onclick="adj('pt-qtd',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Meta</div><input type="number" id="pt-meta" value="80"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Matérias-primas usadas</div>
+      <div class="field"><div class="field-label">Areia (kg)</div><input type="number" id="pt-areia" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Roving (kg)</div><input type="number" id="pt-roving" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Resina 3100 (un)</div><input type="number" id="pt-resina" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Pigmento Branco (kg)</div><input type="number" id="pt-pig-b" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Pigmento Preto (kg)</div><input type="number" id="pt-pig-p" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Pigmento Cinza (kg)</div><input type="number" id="pt-pig-c" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Pigmento Bege (kg)</div><input type="number" id="pt-pig-bg" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Desperdício total (kg)</div><input type="number" id="pt-desp" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="pt-obs" placeholder="Paradas, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-pt" onclick="salvar('pt')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- MICRONIZADOR -->
+<div class="form-screen" id="form-micro">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="form-header-info"><div class="form-title">Micronizador</div><div class="form-subtitle">VAZÃO E PRODUÇÃO</div></div>
+    <div class="form-accent-dot" style="background:#F0B429"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Turno</div>
+      <div class="field">
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'micro-turno','Diurno')">Diurno</div>
+          <div class="seg-btn" onclick="seg(this,'micro-turno','Vespertino')">Vespertino</div>
+          <div class="seg-btn" onclick="seg(this,'micro-turno','Noturno')">Noturno</div>
+        </div><input type="hidden" id="micro-turno" value="Diurno">
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Produção</div>
+      <div class="field"><div class="field-label">Produção do turno (kg)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('micro-prod',-10)">−</button>
+          <input class="num-input" type="number" id="micro-prod" value="0" oninput="calcMicro()">
+          <button class="num-btn" onclick="adj('micro-prod',10);calcMicro()">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Tempo de operação (min)</div><input type="number" id="micro-min" value="480" oninput="calcMicro()"></div>
+      <div class="field"><div class="field-label">Quantidade de sacos</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('micro-sacos',-1)">−</button>
+          <input class="num-input" type="number" id="micro-sacos" value="0" oninput="calcMicro()">
+          <button class="num-btn" onclick="adj('micro-sacos',1);calcMicro()">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="calc-result">
+          <div class="calc-result-title">Calculado automaticamente</div>
+          <div class="calc-result-row"><span>Vazão kg/min</span><strong id="mc-vmin">0.000</strong></div>
+          <div class="calc-result-row"><span>Vazão kg/h</span><strong id="mc-vh">0.0</strong></div>
+          <div class="calc-result-row"><span>kg por saco</span><strong id="mc-kgs">—</strong></div>
+          <div class="calc-result-row"><span>Projeção turno 8h</span><strong id="mc-proj">0 kg</strong></div>
+          <div class="calc-result-row"><span>→ MaxFort (50%)</span><strong id="mc-mf">0 kg</strong></div>
+          <div class="calc-result-row"><span>→ KEP (50%)</span><strong id="mc-kep">0 kg</strong></div>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Meta do turno (kg)</div><input type="number" id="micro-meta" value="1000"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="micro-obs" placeholder="Pressão, temperatura, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-micro" onclick="salvar('micro')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- GÁS -->
+<div class="form-screen" id="form-gas">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="form-header-info"><div class="form-title">Central de Gás</div><div class="form-subtitle">4 TANQUES</div></div>
+    <div class="form-accent-dot" style="background:#FF7B72"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Nível dos tanques</div>
+      <div class="tank-row">
+        <div class="tank-item"><div class="tank-name">TANQUE 3093</div><input class="tank-slider" type="range" id="gas-3093" min="0" max="100" value="70" oninput="updateTank('3093')"><div class="tank-pct" id="pct-3093">70%</div><div class="tank-bar"><div class="tank-fill" id="bar-3093" style="width:70%;background:#F0B429"></div></div></div>
+        <div class="tank-item"><div class="tank-name">TANQUE 3095</div><input class="tank-slider" type="range" id="gas-3095" min="0" max="100" value="70" oninput="updateTank('3095')"><div class="tank-pct" id="pct-3095">70%</div><div class="tank-bar"><div class="tank-fill" id="bar-3095" style="width:70%;background:#F0B429"></div></div></div>
+        <div class="tank-item"><div class="tank-name">TANQUE 3096</div><input class="tank-slider" type="range" id="gas-3096" min="0" max="100" value="70" oninput="updateTank('3096')"><div class="tank-pct" id="pct-3096">70%</div><div class="tank-bar"><div class="tank-fill" id="bar-3096" style="width:70%;background:#F0B429"></div></div></div>
+        <div class="tank-item"><div class="tank-name">TANQUE 13595</div><input class="tank-slider" type="range" id="gas-13595" min="0" max="100" value="70" oninput="updateTank('13595')"><div class="tank-pct" id="pct-13595">70%</div><div class="tank-bar"><div class="tank-fill" id="bar-13595" style="width:70%;background:#F0B429"></div></div></div>
+      </div>
+      <div class="field">
+        <div class="calc-result">
+          <div class="calc-result-title">Consolidado</div>
+          <div class="calc-result-row"><span>Média geral</span><strong id="gas-media">70%</strong></div>
+          <div class="calc-result-row"><span>Tanques críticos (&lt;30%)</span><strong id="gas-alertas" style="color:#F85149">0</strong></div>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="gas-obs" placeholder="Pressão, temperatura, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-gas" onclick="salvar('gas')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- CARREGAMENTO -->
+<div class="form-screen" id="form-carga">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="form-header-info"><div class="form-title">Carregamento</div><div class="form-subtitle">STATUS DA FROTA</div></div>
+    <div class="form-accent-dot" style="background:#79C0FF"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Veículo</div>
+      <div class="field"><div class="field-label">Selecione o veículo</div>
+        <select id="cg-veiculo">
+          <option value="">— selecione —</option>
+          <option>MB 16-20 L · DDX-4B56</option><option>MB 16-20 L · CYR-3I40</option>
+          <option>MB ACCELO 13-16 · PXX-1I49</option><option>MB ACCELO 13-16 · RCO-5D97</option>
+          <option>FORD CARGO 11-19 · EZZ-6F69</option><option>FORD CARGO 816 · PLQ-3J31</option>
+          <option>FORD CARGO 816 · PJI-7C73</option><option>VW 8-150 · GZG-0C29</option>
+          <option>FORD F-4000 · JRZ-9J30</option><option>FORD F-2000 · CTH-3D64</option>
+          <option>FORD F-1000 · BTB-7B65</option><option>MB 11-14 · KMJ4A38</option>
+          <option>SCANIA P360 Carreta · OZP-3D60</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Status</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'cg-status','Disponível')">Disponível</div>
+          <div class="seg-btn" onclick="seg(this,'cg-status','Carregando')">Carregando</div>
+          <div class="seg-btn" onclick="seg(this,'cg-status','Em Rota')">Em Rota</div>
+          <div class="seg-btn" onclick="seg(this,'cg-status','Manutenção')">Manutenção</div>
+        </div><input type="hidden" id="cg-status" value="Disponível">
+      </div>
+      <div class="field"><div class="field-label">Motorista</div><input type="text" id="cg-mot" placeholder="Nome do motorista"></div>
+      <div class="field"><div class="field-label">Equipe de carga</div><input type="text" id="cg-equipe" placeholder="Ex: Equipe Carga 1"></div>
+      <div class="field"><div class="field-label">% Carregado <span id="cg-pct-val">0%</span></div>
+        <input type="range" id="cg-pct" min="0" max="100" step="5" value="0" oninput="document.getElementById('cg-pct-val').textContent=this.value+'%'" style="width:100%;accent-color:var(--accent);margin-top:8px">
+      </div>
+      <div class="field"><div class="field-label">Destino</div><input type="text" id="cg-dest" placeholder="Cidade de destino"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="cg-obs" placeholder="Manifesto, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-carga" onclick="salvar('carga')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- REGISTROS SALVOS -->
+<div class="form-screen" id="form-saved">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="form-header-info"><div class="form-title">Registros de hoje</div><div class="form-subtitle" id="saved-subtitle">0 registros</div></div>
+  </div>
+  <div class="form-body">
+    <div class="saved-list" id="saved-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const APPS_SCRIPT_CODE = `function doPost(e){try{var d=JSON.parse(e.postData.contents);var ss=SpreadsheetApp.getActiveSpreadsheet();var sh=ss.getSheetByName(d.setor);if(!sh){sh=ss.insertSheet(d.setor);}var keys=Object.keys(d);if(sh.getLastRow()===0){sh.appendRow(keys);}sh.appendRow(keys.map(function(k){return d[k]!==undefined?d[k]:'';}));return ContentService.createTextOutput(JSON.stringify({ok:true})).setMimeType(ContentService.MimeType.JSON);}catch(err){return ContentService.createTextOutput(JSON.stringify({ok:false,error:err.toString()})).setMimeType(ContentService.MimeType.JSON);}}`;
+
+let cfg = JSON.parse(localStorage.getItem('pcp_cfg')||'{}');
+const hoje = new Date();
+const dataHoje = hoje.toLocaleDateString('pt-BR');
+const diasNome = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+document.getElementById('hoje').textContent = diasNome[hoje.getDay()]+' '+dataHoje;
+
+let registros = JSON.parse(localStorage.getItem('pcp_reg_'+dataHoje)||'[]');
+
+function saveReg(){ localStorage.setItem('pcp_reg_'+dataHoje, JSON.stringify(registros)); }
+
+function salvarConfig(){
+  cfg.url = document.getElementById('sheets-url').value.trim();
+  cfg.wpp = document.getElementById('wpp-numero').value.trim();
+  localStorage.setItem('pcp_cfg', JSON.stringify(cfg));
+  atualizarSyncStatus();
+  showToast('✓ Configuração salva!','ok');
+}
+
+function atualizarSyncStatus(){
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-text');
+  const hint = document.getElementById('config-hint-text');
+  if(cfg.url){
+    dot.className='sync-dot ok';
+    txt.textContent='Conectado ao Google Sheets';
+    hint.innerHTML='✅ Conectado! Registros enviados em tempo real.';
+  } else {
+    dot.className='sync-dot warn';
+    txt.textContent='Configure o Sheets abaixo';
+    hint.innerHTML='⚠️ URL não configurada — registros ficam só no celular.<br><a href="#" onclick="openInstrucoes()">📖 Ver instruções de configuração</a>';
+  }
+  // Preencher campos salvos
+  if(cfg.url) document.getElementById('sheets-url').value=cfg.url;
+  if(cfg.wpp) document.getElementById('wpp-numero').value=cfg.wpp;
+  // Pendentes
+  const pend = registros.filter(r=>!r.enviado).length;
+  const btnR = document.getElementById('btn-reenviar');
+  document.getElementById('pendentes-count').textContent=pend;
+  btnR.style.display = pend>0&&cfg.url ? 'flex':'none';
+}
+
+function atualizarBadges(){
+  const setores=['poly','fibra','pt','micro','gas','carga'];
+  setores.forEach(s=>{
+    const n=registros.filter(r=>r.setor===s).length;
+    document.getElementById('badge-'+s).textContent=n;
+  });
+  document.getElementById('saved-count').textContent=registros.length;
+}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────
+function openForm(id){
+  document.getElementById('home').style.display='none';
+  document.querySelectorAll('.form-screen').forEach(f=>f.classList.remove('active'));
+  document.getElementById('form-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function openInstrucoes(){ openForm('instrucoes'); return false; }
+function goHome(){
+  document.querySelectorAll('.form-screen').forEach(f=>f.classList.remove('active'));
+  document.getElementById('home').style.display='flex';
+  atualizarBadges();
+  atualizarSyncStatus();
+}
+
+// ── HELPERS UI ────────────────────────────────────────────────
+function seg(el,hiddenId,val){
+  el.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById(hiddenId).value=val;
+}
+function adj(id,delta){
+  const el=document.getElementById(id);
+  el.value=Math.max(0,(parseFloat(el.value)||0)+delta);
+  if(id==='poly-ciclos') calcPoly();
+  if(['micro-prod','micro-sacos'].includes(id)) calcMicro();
+}
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function calcPoly(){
+  const c=parseInt(document.getElementById('poly-ciclos').value)||0;
+  const m310=parseInt(document.getElementById('mol-310').value)||0;
+  const m500=parseInt(document.getElementById('mol-500').value)||0;
+  const m1k=parseInt(document.getElementById('mol-1k').value)||0;
+  const m2k=parseInt(document.getElementById('mol-2k').value)||0;
+  document.getElementById('res-310').textContent=(c*m310)+' cx';
+  document.getElementById('res-500').textContent=(c*m500)+' cx';
+  document.getElementById('res-1k').textContent=(c*m1k)+' cx';
+  document.getElementById('res-2k').textContent=(c*m2k)+' cx';
+  document.getElementById('res-tot').textContent=(c*(m310+m500+m1k+m2k))+' cx';
+}
+function calcMicro(){
+  const prod=parseFloat(document.getElementById('micro-prod').value)||0;
+  const min=parseFloat(document.getElementById('micro-min').value)||1;
+  const sacos=parseFloat(document.getElementById('micro-sacos').value)||0;
+  const vmin=prod/min; const vh=vmin*60; const proj=vh*8;
+  document.getElementById('mc-vmin').textContent=vmin.toFixed(3);
+  document.getElementById('mc-vh').textContent=vh.toFixed(1);
+  document.getElementById('mc-kgs').textContent=sacos>0?(prod/sacos).toFixed(1):'—';
+  document.getElementById('mc-proj').textContent=Math.round(proj)+' kg';
+  document.getElementById('mc-mf').textContent=Math.round(proj/2)+' kg';
+  document.getElementById('mc-kep').textContent=Math.round(proj/2)+' kg';
+}
+function updateTank(id){
+  const v=document.getElementById('gas-'+id).value;
+  const col=v>=60?'#3FB950':v>=30?'#F0B429':'#F85149';
+  document.getElementById('pct-'+id).textContent=v+'%';
+  document.getElementById('pct-'+id).style.color=col;
+  document.getElementById('bar-'+id).style.width=v+'%';
+  document.getElementById('bar-'+id).style.background=col;
+  const ids=['3093','3095','3096','13595'];
+  const vals=ids.map(i=>parseInt(document.getElementById('gas-'+i).value));
+  document.getElementById('gas-media').textContent=Math.round(vals.reduce((a,b)=>a+b,0)/4)+'%';
+  document.getElementById('gas-alertas').textContent=vals.filter(v=>v<30).length;
+}
+
+// ── ENVIO AO GOOGLE SHEETS ────────────────────────────────────
+async function enviarSheets(data){
+  if(!cfg.url) return false;
+  try{
+    await fetch(cfg.url,{method:'POST',body:JSON.stringify(data),headers:{'Content-Type':'text/plain'}});
+    return true;
+  }catch(e){ return false; }
+}
+
+async function reenviarPendentes(){
+  if(!cfg.url){showToast('Configure a URL do Sheets primeiro','err');return;}
+  const pend=registros.filter(r=>!r.enviado);
+  if(!pend.length){showToast('Nenhum pendente','ok');return;}
+  showToast('Reenviando '+pend.length+' registros...','send');
+  let ok=0;
+  for(const r of pend){
+    const res=await enviarSheets(r);
+    if(res){r.enviado=true;ok++;}
+  }
+  saveReg();
+  atualizarSyncStatus();
+  showToast(ok+' registro(s) enviado(s)!','ok');
+}
+
+// ── SALVAR ────────────────────────────────────────────────────
+async function salvar(tipo){
+  const btnId='btn-'+tipo;
+  const btn=document.getElementById(btnId);
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div> Enviando...';
+
+  const data={setor:tipo,data:dataHoje,hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
+
+  if(tipo==='poly'){
+    const c=parseInt(document.getElementById('poly-ciclos').value)||0;
+    const m310=parseInt(document.getElementById('mol-310').value)||0;
+    const m500=parseInt(document.getElementById('mol-500').value)||0;
+    const m1k=parseInt(document.getElementById('mol-1k').value)||0;
+    const m2k=parseInt(document.getElementById('mol-2k').value)||0;
+    Object.assign(data,{turno:document.getElementById('poly-turno').value,maquina:document.getElementById('poly-maq').value,carro:document.getElementById('poly-carro').value,operador:document.getElementById('poly-op').value,equipe:document.getElementById('poly-equipe').value,ciclos:c,mol_310:m310,mol_500:m500,mol_1000:m1k,mol_2000:m2k,cx_310:c*m310,cx_500:c*m500,cx_1000:c*m1k,cx_2000:c*m2k,total_cx:c*(m310+m500+m1k+m2k),pintura:parseInt(document.getElementById('poly-pint').value)||0,mat_kg:parseFloat(document.getElementById('poly-mat').value)||0,desp_kg:parseFloat(document.getElementById('poly-desp').value)||0,meta:parseInt(document.getElementById('poly-meta').value)||0,obs:document.getElementById('poly-obs').value});
+  } else if(tipo==='fibra'){
+    Object.assign(data,{turno:document.getElementById('fibra-turno').value,equipe:document.getElementById('fibra-equipe').value,produto:document.getElementById('fibra-prod').value,tipo_prod:document.getElementById('fibra-tipo').value,qtd:parseInt(document.getElementById('fibra-qtd').value)||0,pintura:parseInt(document.getElementById('fibra-pint').value)||0,multi_prod:document.getElementById('fibra-multi').value,multi_qtd:parseInt(document.getElementById('fibra-muli').value)||0,resina_kg:parseFloat(document.getElementById('fb-resina').value)||0,roving_kg:parseFloat(document.getElementById('fb-roving').value)||0,catal_l:parseFloat(document.getElementById('fb-catal').value)||0,gel_l:parseFloat(document.getElementById('fb-gel').value)||0,estireno_l:parseFloat(document.getElementById('fb-est').value)||0,carbonato_kg:parseFloat(document.getElementById('fb-carb').value)||0,desp_kg:parseFloat(document.getElementById('fb-desp').value)||0,obs:document.getElementById('fibra-obs').value});
+  } else if(tipo==='pt'){
+    Object.assign(data,{turno:document.getElementById('pt-turno').value,equipe:document.getElementById('pt-equipe').value,produto:document.getElementById('pt-prod').value,cor:document.getElementById('pt-cor').value,qtd:parseInt(document.getElementById('pt-qtd').value)||0,meta:parseInt(document.getElementById('pt-meta').value)||0,areia_kg:parseFloat(document.getElementById('pt-areia').value)||0,roving_kg:parseFloat(document.getElementById('pt-roving').value)||0,resina_un:parseFloat(document.getElementById('pt-resina').value)||0,pig_branco:parseFloat(document.getElementById('pt-pig-b').value)||0,pig_preto:parseFloat(document.getElementById('pt-pig-p').value)||0,pig_cinza:parseFloat(document.getElementById('pt-pig-c').value)||0,pig_bege:parseFloat(document.getElementById('pt-pig-bg').value)||0,desp_kg:parseFloat(document.getElementById('pt-desp').value)||0,obs:document.getElementById('pt-obs').value});
+  } else if(tipo==='micro'){
+    const prod=parseFloat(document.getElementById('micro-prod').value)||0;
+    const min=parseFloat(document.getElementById('micro-min').value)||1;
+    const sacos=parseInt(document.getElementById('micro-sacos').value)||0;
+    Object.assign(data,{turno:document.getElementById('micro-turno').value,prod_kg:prod,tempo_min:min,sacos,vazao_min:+(prod/min).toFixed(3),vazao_hora:+((prod/min)*60).toFixed(1),meta_kg:parseFloat(document.getElementById('micro-meta').value)||0,obs:document.getElementById('micro-obs').value});
+  } else if(tipo==='gas'){
+    Object.assign(data,{t3093:parseInt(document.getElementById('gas-3093').value),t3095:parseInt(document.getElementById('gas-3095').value),t3096:parseInt(document.getElementById('gas-3096').value),t13595:parseInt(document.getElementById('gas-13595').value),obs:document.getElementById('gas-obs').value});
+  } else if(tipo==='carga'){
+    Object.assign(data,{veiculo:document.getElementById('cg-veiculo').value,status:document.getElementById('cg-status').value,motorista:document.getElementById('cg-mot').value,equipe:document.getElementById('cg-equipe').value,pct_carg:document.getElementById('cg-pct').value,destino:document.getElementById('cg-dest').value,obs:document.getElementById('cg-obs').value});
+  }
+
+  const enviado = await enviarSheets(data);
+  data.enviado = enviado;
+  data.id = Date.now();
+  registros.push(data);
+  saveReg();
+
+  btn.disabled=false;
+  btn.innerHTML='✓ Salvar e enviar ao Sheets';
+
+  if(enviado){
+    showToast('✓ Salvo e enviado ao Sheets!','ok');
+  } else if(cfg.url){
+    showToast('⚠ Salvo localmente (sem internet)','send');
+  } else {
+    showToast('✓ Salvo localmente','ok');
+  }
+  setTimeout(goHome,1200);
+}
+
+// ── WHATSAPP ──────────────────────────────────────────────────
+function enviarWhatsApp(){
+  if(!registros.length){showToast('Nenhum registro hoje','err');return;}
+  const numero=(cfg.wpp||'').replace(/\D/g,'');
+  if(!numero){showToast('Configure o número do supervisor','err');openForm('instrucoes');return;}
+  let msg='📊 *PCP MESTRE — RESUMO DO DIA*\n📅 '+dataHoje+'\n─────────────────────\n\n';
+  const polys=registros.filter(r=>r.setor==='poly');
+  if(polys.length){
+    msg+='📦 *POLIETILENO*\n';
+    const t310=polys.reduce((a,r)=>a+(r.cx_310||0),0);
+    const t500=polys.reduce((a,r)=>a+(r.cx_500||0),0);
+    const t1k=polys.reduce((a,r)=>a+(r.cx_1000||0),0);
+    const t2k=polys.reduce((a,r)=>a+(r.cx_2000||0),0);
+    if(t310) msg+=`  • 310L: ${t310} cx\n`;
+    if(t500) msg+=`  • 500L: ${t500} cx\n`;
+    if(t1k)  msg+=`  • 1.000L: ${t1k} cx\n`;
+    if(t2k)  msg+=`  • 2.000L: ${t2k} cx\n`;
+    msg+=`  • *Total: ${t310+t500+t1k+t2k} cx*\n\n`;
+  }
+  const fibras=registros.filter(r=>r.setor==='fibra');
+  if(fibras.length){
+    msg+='🏗️ *FIBRA*\n';
+    const tCx=fibras.reduce((a,r)=>a+(r.qtd||0),0);
+    const tMu=fibras.reduce((a,r)=>a+(r.multi_qtd||0),0);
+    if(tCx) msg+=`  • Caixas/Tampas: ${tCx} un\n`;
+    if(tMu) msg+=`  • Multiuso: ${tMu} un\n`;
+    msg+=`  • *Total: ${tCx+tMu} un*\n\n`;
+  }
+  const pts=registros.filter(r=>r.setor==='pt');
+  if(pts.length){
+    msg+='🚿 *PIAS E TANQUES*\n';
+    msg+=`  • *Total: ${pts.reduce((a,r)=>a+(r.qtd||0),0)} un*\n`;
+    ['Branco','Bege','Cinza','Preto'].forEach(cor=>{
+      const v=pts.filter(r=>r.cor===cor).reduce((a,r)=>a+(r.qtd||0),0);
+      if(v) msg+=`  • ${cor}: ${v} un\n`;
+    });
+    msg+='\n';
+  }
+  const micros=registros.filter(r=>r.setor==='micro');
+  if(micros.length){
+    msg+='⚡ *MICRONIZADOR*\n';
+    msg+=`  • Produção: ${micros.reduce((a,r)=>a+(r.prod_kg||0),0)} kg\n`;
+    const last=micros[micros.length-1];
+    if(last.vazao_min) msg+=`  • Vazão: ${last.vazao_min} kg/min\n`;
+    msg+='\n';
+  }
+  const gases=registros.filter(r=>r.setor==='gas');
+  if(gases.length){
+    const g=gases[gases.length-1];
+    msg+='🔥 *CENTRAL DE GÁS*\n';
+    msg+=`  • 3093:${g.t3093}% | 3095:${g.t3095}%\n`;
+    msg+=`  • 3096:${g.t3096}% | 13595:${g.t13595}%\n`;
+    const alertas=[g.t3093,g.t3095,g.t3096,g.t13595].filter(v=>v<30).length;
+    if(alertas) msg+=`  • ⚠️ ${alertas} tanque(s) crítico(s)!\n`;
+    msg+='\n';
+  }
+  const cargas=registros.filter(r=>r.setor==='carga');
+  if(cargas.length){
+    msg+='🚛 *CARREGAMENTO*\n';
+    const rota=cargas.filter(r=>r.status==='Em Rota');
+    const carr=cargas.filter(r=>r.status==='Carregando');
+    const disp=cargas.filter(r=>r.status==='Disponível');
+    if(rota.length) msg+=`  • Em rota: ${rota.length} veículo(s)\n`;
+    if(carr.length) msg+=`  • Carregando: ${carr.length} veículo(s)\n`;
+    if(disp.length) msg+=`  • Disponíveis: ${disp.length}\n`;
+    msg+='\n';
+  }
+  const pend=registros.filter(r=>!r.enviado).length;
+  if(pend) msg+=`⚠️ _${pend} registro(s) não sincronizados com Sheets_\n\n`;
+  msg+='─────────────────────\n_Enviado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'_';
+  window.open('https://wa.me/'+numero+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ── REGISTROS SALVOS ──────────────────────────────────────────
+const setorColors={poly:'#58A6FF',fibra:'#3FB950',pt:'#D2A8FF',micro:'#F0B429',gas:'#FF7B72',carga:'#79C0FF'};
+const setorNames={poly:'Polietileno',fibra:'Fibra',pt:'Pias/Tanques',micro:'Micronizador',gas:'Gás',carga:'Carregamento'};
+
+function renderSaved(){
+  const list=document.getElementById('saved-list');
+  document.getElementById('saved-subtitle').textContent=registros.length+' registro(s)';
+  if(!registros.length){list.innerHTML='<div style="text-align:center;color:var(--text2);padding:40px 0">Nenhum registro hoje.</div>';return;}
+  list.innerHTML=registros.slice().reverse().map(r=>{
+    const cor=setorColors[r.setor]||'#888';
+    const nome=setorNames[r.setor]||r.setor;
+    let resumo='';
+    if(r.setor==='poly') resumo=`${r.turno} · ${r.maquina} ${r.carro} · ${r.total_cx||0} cx`;
+    else if(r.setor==='fibra') resumo=`${r.turno} · ${r.produto||''} · ${r.qtd||0} un`;
+    else if(r.setor==='pt') resumo=`${r.turno} · ${r.produto||''} ${r.cor||''} · ${r.qtd||0} un`;
+    else if(r.setor==='micro') resumo=`${r.turno} · ${r.prod_kg||0} kg · ${r.vazao_min} kg/min`;
+    else if(r.setor==='gas') resumo=`3093:${r.t3093}% 3095:${r.t3095}% 3096:${r.t3096}% 13595:${r.t13595}%`;
+    else if(r.setor==='carga') resumo=`${r.veiculo||''} · ${r.status||''}`;
+    const syncIcon=r.enviado?'<span style="color:#2EA043">✓ Sheets</span>':'<span style="color:#F0B429">⏳ Pendente</span>';
+    return`<div class="saved-item"><div class="saved-item-header"><div class="saved-item-title" style="color:${cor}">${nome}</div><div class="saved-item-time">${r.hora}</div></div><div class="saved-item-body">${resumo}</div><div class="saved-item-status">${syncIcon}</div></div>`;
+  }).join('');
+}
+
+function copyScript(){
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>showToast('✓ Código copiado!','ok')).catch(()=>showToast('Selecione e copie manualmente','err'));
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+atualizarSyncStatus();
+atualizarBadges();
+
+// Override openForm para renderSaved
+const _openForm=openForm;
+window.openForm=function(id){
+  _openForm(id);
+  if(id==='saved') renderSaved();
+};
+</script>
+</body>
+</html>

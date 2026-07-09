@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PCP Mestre</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D1117;--bg2:#161B22;--bg3:#1C2330;--border:#30363D;--text:#E6EDF3;--text2:#8B949E;--text3:#6E7681;--accent:#F0B429;--accent2:#E8A016;--green:#2EA043;--green-bg:#0D2F1A;--red:#F85149;--red-bg:#2D0F0F;--blue:#58A6FF;--blue-bg:#0D1F3C;--radius:12px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;overscroll-behavior:none}
+/* LOGIN */
+.login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:var(--bg)}
+.login-card{width:100%;max-width:360px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:32px 24px}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;justify-content:center}
+.login-logo-icon{width:48px;height:48px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px}
+.login-logo-text{font-size:22px;font-weight:700;color:var(--text)}
+.login-logo-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.login-field{margin-bottom:14px}
+.login-label{font-size:12px;color:var(--text2);margin-bottom:6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+.login-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Sora',sans-serif;font-size:16px;padding:13px 14px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(240,180,41,.12)}
+.login-btn{width:100%;padding:15px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#000;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .15s}
+.login-btn:active{transform:scale(.98)}
+.login-error{color:#F85149;font-size:13px;text-align:center;margin-top:10px;min-height:20px;font-family:'DM Mono',monospace}
+/* HOME */
+.home{display:none;flex-direction:column;min-height:100vh}
+.home-header{background:linear-gradient(135deg,#1A2332 0%,#0D1117 60%);padding:28px 20px 20px;border-bottom:1px solid var(--border)}
+.home-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.home-logo-row{display:flex;align-items:center;gap:10px}
+.home-logo-icon{width:38px;height:38px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px}
+.home-title{font-size:18px;font-weight:700;color:var(--text)}
+.home-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace}
+.home-user{display:flex;align-items:center;gap:8px}
+.user-badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--accent);font-family:'DM Mono',monospace;font-weight:500}
+.logout-btn{padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:11px;cursor:pointer}
+.home-date{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:6px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#2EA043;display:inline-block}
+/* GRID */
+.setores-grid{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1}
+.setor-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:8px;min-height:110px;-webkit-user-select:none;user-select:none}
+.setor-card:active{transform:scale(.97);background:var(--bg3)}
+.setor-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 var(--radius) var(--radius);background:var(--card-color,#888)}
+.setor-icon{font-size:26px}
+.setor-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.setor-sub{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace}
+.setor-badge{position:absolute;top:8px;right:8px;background:var(--card-color,#888);color:#000;font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;font-family:'DM Mono',monospace}
+/* FORM */
+.form-screen{display:none;flex-direction:column;min-height:100vh}
+.form-screen.active{display:flex}
+.form-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.back-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.form-title{font-size:14px;font-weight:600;color:var(--text)}
+.form-subtitle{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:1px}
+.form-accent-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-left:auto}
+.form-body{flex:1;padding:14px;overflow-y:auto;padding-bottom:90px}
+.form-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
+.form-section-title{padding:10px 14px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;background:var(--bg3);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace}
+.field{padding:11px 14px;border-bottom:1px solid var(--border)}
+.field:last-child{border-bottom:none}
+.field-label{font-size:12px;color:var(--text2);margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Sora',sans-serif;font-size:14px;padding:11px 12px;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field input[type=number]{font-family:'DM Mono',monospace;font-size:17px;font-weight:500}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B949E' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.field textarea{resize:none;height:72px;font-size:13px}
+.seg-ctrl{display:flex;gap:5px;flex-wrap:wrap}
+.seg-btn{flex:1;min-width:55px;padding:9px 6px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;font-weight:500;cursor:pointer;text-align:center;transition:all .15s}
+.seg-btn.on{background:var(--accent);color:#000;border-color:var(--accent)}
+.num-row{display:flex;align-items:center;gap:8px}
+.num-btn{width:42px;height:42px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.num-btn:active{background:var(--accent);color:#000}
+.num-input{flex:1;text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'DM Mono',monospace;font-size:26px;font-weight:700;padding:9px;outline:none}
+.num-input:focus{border-color:var(--accent)}
+.moldes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.molde-item{text-align:center}
+.molde-label{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:3px}
+.molde-input{width:100%;text-align:center;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--accent);font-family:'DM Mono',monospace;font-size:18px;font-weight:700;padding:9px 3px;outline:none}
+.calc-box{background:var(--blue-bg);border:1px solid rgba(88,166,255,.25);border-radius:var(--radius-sm);padding:11px 13px;font-family:'DM Mono',monospace}
+.calc-title{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+.calc-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text);padding:2px 0}
+.calc-row strong{color:var(--blue)}
+.tank-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:11px 14px}
+.tank-item{background:var(--bg3);border-radius:9px;padding:11px;text-align:center}
+.tank-name{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:7px}
+.tank-slider{width:100%;accent-color:var(--accent);margin-bottom:5px}
+.tank-pct{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
+.tank-bar{width:100%;height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:5px}
+.tank-fill{height:100%;border-radius:3px;transition:width .3s}
+.submit-bar{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:14px;z-index:200}
+.submit-btn{width:100%;padding:14px;border-radius:var(--radius);border:none;background:var(--accent);color:#000;font-family:'Sora',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.submit-btn:active{transform:scale(.98)}
+.submit-btn:disabled{background:var(--bg3);color:var(--text3)}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);padding:11px 22px;border-radius:28px;font-size:13px;font-weight:600;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#2EA043;color:#fff}
+.toast.err{background:#F85149;color:#fff}
+.toast.info{background:#185FA5;color:#fff}
+.action-btn{width:100%;padding:11px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px}
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.kpi-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.kpi-label{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.kpi-value{font-size:22px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;line-height:1}
+.kpi-unit{font-size:11px;color:var(--text2);font-weight:400}
+.kpi-card.alert{border-color:#F85149;background:var(--red-bg)}
+.kpi-card.alert .kpi-value{color:#F85149}
+.kpi-card.good{border-color:#2EA043;background:var(--green-bg)}
+.kpi-card.good .kpi-value{color:#2EA043}
+.dash-section{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.dash-section-title{padding:9px 13px;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;background:var(--bg3);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace}
+.dash-row{display:flex;justify-content:space-between;align-items:center;padding:7px 13px;border-bottom:1px solid var(--border);font-size:12px}
+.dash-row:last-child{border-bottom:none}
+.dash-label{color:var(--text2)}
+.dash-value{font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+.dash-value.ok{color:#2EA043}
+.dash-value.warn{color:#F0B429}
+.dash-value.danger{color:#F85149}
+.tag{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:600;font-family:'DM Mono',monospace}
+.tag-ok{background:rgba(46,160,67,.15);color:#3FB950}
+.tag-warn{background:rgba(240,180,41,.15);color:#F0B429}
+.tag-danger{background:rgba(248,81,73,.15);color:#F85149}
+.tag-blue{background:rgba(88,166,255,.15);color:#58A6FF}
+/* PINTURA */
+.pintura-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)}
+.pintura-item:last-child{border-bottom:none}
+.pintura-nome{font-size:13px;color:var(--text);font-weight:500}
+.pintura-qtd{font-size:18px;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace}
+.pintura-baixa-btn{padding:6px 12px;border-radius:7px;border:1px solid #2EA043;background:rgba(46,160,67,.1);color:#3FB950;font-size:11px;cursor:pointer;font-family:'DM Mono',monospace}
+/* SAVED */
+.saved-item{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:7px}
+.saved-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.saved-title{font-size:12px;font-weight:600}
+.saved-time{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace}
+.saved-body{font-size:11px;color:var(--text2);line-height:1.5}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.config-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:0 0 10px}
+.config-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px}
+.config-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;padding:9px 11px;outline:none;margin-bottom:7px}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">⚙️</div>
+      <div>
+        <div class="login-logo-text">PCP Mestre</div>
+        <div class="login-logo-sub">CONTROLE DE PRODUÇÃO</div>
+      </div>
+    </div>
+    <div class="login-field">
+      <div class="login-label">Usuário</div>
+      <select class="login-input" id="login-user">
+        <option value="">— selecione —</option>
+        <option value="Maria">Maria</option>
+        <option value="Niltonei">Niltonei</option>
+        <option value="Marcio">Marcio</option>
+        <option value="Nelio">Nelio</option>
+        <option value="Wendel">Wendel</option>
+      </select>
+    </div>
+    <div class="login-field">
+      <div class="login-label">Senha</div>
+      <input class="login-input" id="login-pass" type="password" placeholder="••••" onkeydown="if(event.key==='Enter')fazerLogin()">
+    </div>
+    <button class="login-btn" onclick="fazerLogin()">Entrar</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div id="home" class="home">
+  <div class="home-header">
+    <div class="home-top">
+      <div class="home-logo-row">
+        <div class="home-logo-icon">⚙️</div>
+        <div>
+          <div class="home-title">PCP Mestre</div>
+          <div class="home-sub" id="home-date-txt"></div>
+        </div>
+      </div>
+      <div class="home-user">
+        <div class="user-badge" id="user-badge">—</div>
+        <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2)">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-text">Conectado ao Google Sheets</span>
+    </div>
+  </div>
+
+  <!-- Config (só Wendel vê) -->
+  <div id="config-panel" class="config-panel" style="display:none;margin:12px 14px 0">
+    <div class="config-title">🔗 Configuração — apenas supervisor</div>
+    <input class="config-input" id="sheets-url" placeholder="URL Apps Script" type="url" value="https://script.google.com/macros/library/d/1pdQMc7oA6hhOaWalfaYuEHYn9vgsqOcW1zPuc5r1k2pVFIe9bSrhGBqq/2">
+    <input class="config-input" id="wpp-numero" placeholder="WhatsApp" type="tel" value="5577988260805">
+  </div>
+
+  <div class="setores-grid" id="setores-grid">
+    <!-- gerado por JS -->
+  </div>
+
+  <div style="padding:0 14px 14px">
+    <button class="action-btn" style="background:#25D366;color:#fff;border-color:#25D366;font-weight:600" onclick="enviarWhatsApp()">📱 Enviar resumo via WhatsApp</button>
+    <button class="action-btn" onclick="openForm('saved')">📋 Registros salvos hoje (<span id="saved-count">0</span>)</button>
+    <button class="action-btn" id="btn-reenviar" style="display:none" onclick="reenviarPendentes()">🔄 Reenviar pendentes (<span id="pendentes-count">0</span>)</button>
+  </div>
+</div>
+
+<!-- ══ POLIETILENO ══ -->
+<div class="form-screen" id="form-poly">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Polietileno</div><div class="form-subtitle">MaxFort · KEP · 3 TURNOS</div></div>
+    <div class="form-accent-dot" style="background:#58A6FF"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Identificação</div>
+      <div class="field"><div class="field-label">Turno</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'poly-turno','Diurno')">Diurno</div>
+          <div class="seg-btn" onclick="seg(this,'poly-turno','Vespertino')">Vespertino</div>
+          <div class="seg-btn" onclick="seg(this,'poly-turno','Noturno')">Noturno</div>
+        </div><input type="hidden" id="poly-turno" value="Diurno">
+      </div>
+      <div class="field"><div class="field-label">Máquina</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'poly-maq','MaxFort')">MaxFort</div>
+          <div class="seg-btn" onclick="seg(this,'poly-maq','KEP')">KEP</div>
+        </div><input type="hidden" id="poly-maq" value="MaxFort">
+      </div>
+      <div class="field"><div class="field-label">Carro</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'poly-carro','Carro 1')">Carro 1</div>
+          <div class="seg-btn" onclick="seg(this,'poly-carro','Carro 2')">Carro 2</div>
+        </div><input type="hidden" id="poly-carro" value="Carro 1">
+      </div>
+      <div class="field"><div class="field-label">Operador</div><input type="text" id="poly-op" placeholder="Nome do operador"></div>
+      <div class="field"><div class="field-label">Equipe</div><input type="text" id="poly-equipe" placeholder="Ex: Equipe A"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Moldes configurados</div>
+      <div class="field">
+        <div class="field-label">Qtd de moldes por tamanho</div>
+        <div class="moldes-grid">
+          <div class="molde-item"><div class="molde-label">310L</div><input class="molde-input" type="number" id="mol-310" value="0" min="0" oninput="calcPoly()"></div>
+          <div class="molde-item"><div class="molde-label">500L</div><input class="molde-input" type="number" id="mol-500" value="0" min="0" oninput="calcPoly()"></div>
+          <div class="molde-item"><div class="molde-label">1.000L</div><input class="molde-input" type="number" id="mol-1k" value="0" min="0" oninput="calcPoly()"></div>
+          <div class="molde-item"><div class="molde-label">2.000L</div><input class="molde-input" type="number" id="mol-2k" value="0" min="0" oninput="calcPoly()"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Produção normal</div>
+      <div class="field"><div class="field-label">Número de ciclos no turno</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-ciclos',-1)">−</button>
+          <input class="num-input" type="number" id="poly-ciclos" value="0" min="0" oninput="calcPoly()">
+          <button class="num-btn" onclick="adj('poly-ciclos',1)">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="calc-box">
+          <div class="calc-title">Caixas produzidas (automático)</div>
+          <div class="calc-row"><span>310L</span><strong id="res-310">0 cx</strong></div>
+          <div class="calc-row"><span>500L</span><strong id="res-500">0 cx</strong></div>
+          <div class="calc-row"><span>1.000L</span><strong id="res-1k">0 cx</strong></div>
+          <div class="calc-row"><span>2.000L</span><strong id="res-2k">0 cx</strong></div>
+          <div class="calc-row" style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(88,166,255,.2)"><span>Total</span><strong id="res-tot" style="font-size:15px">0 cx</strong></div>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Na pintura (caixas → vão para seção Pintura)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-pint',-1)">−</button>
+          <input class="num-input" type="number" id="poly-pint" value="0" min="0">
+          <button class="num-btn" onclick="adj('poly-pint',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Material usado (kg)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-mat',-5)">−</button>
+          <input class="num-input" type="number" id="poly-mat" value="0" min="0">
+          <button class="num-btn" onclick="adj('poly-mat',5)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Desperdício (kg)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-desp',-1)">−</button>
+          <input class="num-input" type="number" id="poly-desp" value="0" min="0">
+          <button class="num-btn" onclick="adj('poly-desp',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Meta do turno (caixas)</div><input type="number" id="poly-meta" value="56"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">⚠️ Caixas com avaria</div>
+      <div class="field"><div class="field-label">Tipo de avaria</div>
+        <select id="poly-avaria-tipo">
+          <option value="">— sem avaria —</option>
+          <option>Deformação</option><option>Bolha</option><option>Trinca</option>
+          <option>Cor incorreta</option><option>Dimensional</option><option>Outro</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Tamanho da caixa com avaria</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'poly-av-tam','310L')">310L</div>
+          <div class="seg-btn" onclick="seg(this,'poly-av-tam','500L')">500L</div>
+          <div class="seg-btn" onclick="seg(this,'poly-av-tam','1.000L')">1.000L</div>
+          <div class="seg-btn" onclick="seg(this,'poly-av-tam','2.000L')">2.000L</div>
+        </div><input type="hidden" id="poly-av-tam" value="310L">
+      </div>
+      <div class="field"><div class="field-label">Quantidade com avaria</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('poly-avaria',-1)">−</button>
+          <input class="num-input" type="number" id="poly-avaria" value="0" min="0">
+          <button class="num-btn" onclick="adj('poly-avaria',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="poly-obs" placeholder="Descreva o problema, causa, etc."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-poly" onclick="salvar('poly')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- ══ FIBRA ══ -->
+<div class="form-screen" id="form-fibra">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Fibra</div><div class="form-subtitle">DIURNO · VESPERTINO</div></div>
+    <div class="form-accent-dot" style="background:#3FB950"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Identificação</div>
+      <div class="field"><div class="field-label">Turno</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'fibra-turno','Diurno')">Diurno</div>
+          <div class="seg-btn" onclick="seg(this,'fibra-turno','Vespertino')">Vespertino</div>
+        </div><input type="hidden" id="fibra-turno" value="Diurno">
+      </div>
+      <div class="field"><div class="field-label">Equipe</div><input type="text" id="fibra-equipe" placeholder="Ex: Equipe C"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Produtos com tampa</div>
+      <div class="field"><div class="field-label">Produto</div>
+        <select id="fibra-prod">
+          <option value="">— selecione —</option>
+          <option>Cx 250L</option><option>Cx 500L</option>
+          <option>Cx 1.000L Mod.Alta</option><option>Cx 1.000L Mod.Baixa</option>
+          <option>Cx 2.000L Mod.Alta</option><option>Cx 2.000L Mod.Baixa</option>
+          <option>Cx 5.000L</option><option>Cx 10.000L</option>
+          <option>Cx 12.000L</option><option>Cx 15.000L</option><option>Cx 20.000L</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Tipo</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'fibra-tipo','Caixa')">Caixa</div>
+          <div class="seg-btn" onclick="seg(this,'fibra-tipo','Tampa')">Tampa</div>
+        </div><input type="hidden" id="fibra-tipo" value="Caixa">
+      </div>
+      <div class="field"><div class="field-label">Quantidade produzida</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('fibra-qtd',-1)">−</button>
+          <input class="num-input" type="number" id="fibra-qtd" value="0" min="0">
+          <button class="num-btn" onclick="adj('fibra-qtd',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Na pintura (→ vão para seção Pintura)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('fibra-pint',-1)">−</button>
+          <input class="num-input" type="number" id="fibra-pint" value="0" min="0">
+          <button class="num-btn" onclick="adj('fibra-pint',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Multiuso — sem tampa</div>
+      <div class="field"><div class="field-label">Produto</div>
+        <select id="fibra-multi">
+          <option value="">— nenhum —</option>
+          <option>Cx 1.000L Multiuso</option><option>Cx 2.000L Multiuso</option><option>Cx 3.000L Multiuso</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Quantidade</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('fibra-muli',-1)">−</button>
+          <input class="num-input" type="number" id="fibra-muli" value="0" min="0">
+          <button class="num-btn" onclick="adj('fibra-muli',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">⚠️ Avaria</div>
+      <div class="field"><div class="field-label">Produto com avaria</div>
+        <select id="fibra-av-prod">
+          <option value="">— sem avaria —</option>
+          <option>Cx 250L</option><option>Cx 500L</option><option>Cx 1.000L Mod.Alta</option>
+          <option>Cx 1.000L Mod.Baixa</option><option>Cx 2.000L Mod.Alta</option><option>Cx 2.000L Mod.Baixa</option>
+          <option>Cx 5.000L</option><option>Cx 10.000L</option><option>Cx 1.000L Multiuso</option>
+          <option>Cx 2.000L Multiuso</option><option>Cx 3.000L Multiuso</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Quantidade com avaria</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('fibra-avaria',-1)">−</button>
+          <input class="num-input" type="number" id="fibra-avaria" value="0" min="0">
+          <button class="num-btn" onclick="adj('fibra-avaria',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Matérias-primas usadas</div>
+      <div class="field"><div class="field-label">Resina (kg)</div><input type="number" id="fb-resina" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Roving (kg)</div><input type="number" id="fb-roving" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Catalisador (L)</div><input type="number" id="fb-catal" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Gel Coat (L)</div><input type="number" id="fb-gel" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Estireno (L)</div><input type="number" id="fb-est" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Carbonato (kg)</div><input type="number" id="fb-carb" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Desperdício (kg)</div><input type="number" id="fb-desp" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="fibra-obs" placeholder="Paradas, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-fibra" onclick="salvar('fibra')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- ══ PIAS E TANQUES ══ -->
+<div class="form-screen" id="form-pt">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Pias e Tanques</div><div class="form-subtitle">4 CORES · EQUIPES</div></div>
+    <div class="form-accent-dot" style="background:#D2A8FF"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Identificação</div>
+      <div class="field"><div class="field-label">Turno</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'pt-turno','Diurno')">Diurno</div>
+          <div class="seg-btn" onclick="seg(this,'pt-turno','Vespertino')">Vespertino</div>
+          <div class="seg-btn" onclick="seg(this,'pt-turno','Noturno')">Noturno</div>
+        </div><input type="hidden" id="pt-turno" value="Diurno">
+      </div>
+      <div class="field"><div class="field-label">Equipe</div><input type="text" id="pt-equipe" placeholder="Ex: Equipe D"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Produto</div>
+      <div class="field"><div class="field-label">Modelo</div>
+        <select id="pt-prod">
+          <option value="">— selecione —</option>
+          <optgroup label="Cubas"><option>Cuba 60x60</option></optgroup>
+          <optgroup label="Pias"><option>Pia 85x50</option><option>Pia 100x50</option><option>Pia 120x50</option><option>Pia 140x50</option></optgroup>
+          <optgroup label="Tanque Duplo"><option>Tanque Duplo 100x50</option><option>Tanque Duplo 110x55</option><option>Tanque Duplo 120x60</option><option>Tanque Duplo 140x70</option><option>Tanque Duplo 160x70</option></optgroup>
+          <optgroup label="Tanque Triplo"><option>Tanque Triplo 140x50</option><option>Tanque Triplo 160x54</option><option>Tanque Triplo 180x70</option></optgroup>
+          <optgroup label="Tanque Bojo"><option>Tanque Bojo 100x50</option></optgroup>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Cor</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'pt-cor','Branco')" style="background:#f0f0f0;color:#000;border-color:#ddd">Branco</div>
+          <div class="seg-btn" onclick="seg(this,'pt-cor','Bege')" style="background:#c8a882;color:#fff;border-color:#c8a882">Bege</div>
+          <div class="seg-btn" onclick="seg(this,'pt-cor','Cinza')" style="background:#888;color:#fff;border-color:#888">Cinza</div>
+          <div class="seg-btn" onclick="seg(this,'pt-cor','Preto')" style="background:#222;color:#fff;border-color:#444">Preto</div>
+        </div><input type="hidden" id="pt-cor" value="Branco">
+      </div>
+      <div class="field"><div class="field-label">Quantidade produzida</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('pt-qtd',-1)">−</button>
+          <input class="num-input" type="number" id="pt-qtd" value="0" min="0">
+          <button class="num-btn" onclick="adj('pt-qtd',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Meta</div><input type="number" id="pt-meta" value="80"></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">⚠️ Avaria</div>
+      <div class="field"><div class="field-label">Produto com avaria</div>
+        <select id="pt-av-prod">
+          <option value="">— sem avaria —</option>
+          <option>Cuba 60x60</option><option>Pia 85x50</option><option>Pia 100x50</option><option>Pia 120x50</option><option>Pia 140x50</option>
+          <option>Tanque Duplo 100x50</option><option>Tanque Duplo 110x55</option><option>Tanque Duplo 120x60</option>
+          <option>Tanque Duplo 140x70</option><option>Tanque Duplo 160x70</option>
+          <option>Tanque Triplo 140x50</option><option>Tanque Triplo 160x54</option><option>Tanque Triplo 180x70</option>
+          <option>Tanque Bojo 100x50</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Cor da avaria</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'pt-av-cor','Branco')">Branco</div>
+          <div class="seg-btn" onclick="seg(this,'pt-av-cor','Bege')">Bege</div>
+          <div class="seg-btn" onclick="seg(this,'pt-av-cor','Cinza')">Cinza</div>
+          <div class="seg-btn" onclick="seg(this,'pt-av-cor','Preto')">Preto</div>
+        </div><input type="hidden" id="pt-av-cor" value="Branco">
+      </div>
+      <div class="field"><div class="field-label">Quantidade com avaria</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('pt-avaria',-1)">−</button>
+          <input class="num-input" type="number" id="pt-avaria" value="0" min="0">
+          <button class="num-btn" onclick="adj('pt-avaria',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Matérias-primas usadas</div>
+      <div class="field"><div class="field-label">Areia (kg)</div><input type="number" id="pt-areia" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Roving (kg)</div><input type="number" id="pt-roving" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Resina 3100 (un)</div><input type="number" id="pt-resina" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Pigmento Branco (kg)</div><input type="number" id="pt-pig-b" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Pigmento Preto (kg)</div><input type="number" id="pt-pig-p" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Pigmento Cinza (kg)</div><input type="number" id="pt-pig-c" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Pigmento Bege (kg)</div><input type="number" id="pt-pig-bg" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Desperdício (kg)</div><input type="number" id="pt-desp" value="0" step="0.1"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="pt-obs" placeholder="Paradas, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-pt" onclick="salvar('pt')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- ══ PINTURA ══ -->
+<div class="form-screen" id="form-pintura">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Pintura</div><div class="form-subtitle">CAIXAS AGUARDANDO PINTURA</div></div>
+    <div class="form-accent-dot" style="background:#FF9900"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Fila de pintura</div>
+      <div id="pintura-lista">
+        <div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">Nenhuma caixa aguardando pintura.</div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Dar baixa na pintura</div>
+      <div class="field"><div class="field-label">Produto pintado</div>
+        <select id="pint-prod">
+          <option value="">— selecione —</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Quantidade pintada</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('pint-qtd',-1)">−</button>
+          <input class="num-input" type="number" id="pint-qtd" value="0" min="0">
+          <button class="num-btn" onclick="adj('pint-qtd',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="pint-obs" placeholder="Cor, ocorrência..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" onclick="darBaixaPintura()">✓ Dar baixa na pintura</button></div>
+</div>
+
+<!-- ══ MÁQUINAS ══ -->
+<div class="form-screen" id="form-maquinas">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Máquinas</div><div class="form-subtitle">MICRONIZADORES · EXTRUSORA</div></div>
+    <div class="form-accent-dot" style="background:#F0B429"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Selecionar máquina</div>
+      <div class="field"><div class="field-label">Máquina</div>
+        <select id="maq-sel" onchange="renderMaqForm()">
+          <option value="micro1">Micronizador 1</option>
+          <option value="micro2">Micronizador 2</option>
+          <option value="micro3">Micronizador 3</option>
+          <option value="extrusora">Extrusora</option>
+        </select>
+      </div>
+    </div>
+    <div id="maq-cadastro-panel" style="display:none">
+      <div class="form-section">
+        <div class="form-section-title">⚙️ Cadastro (somente Wendel)</div>
+        <div class="field"><div class="field-label">Nome da máquina</div><input type="text" id="maq-nome" placeholder="Ex: Micronizador 1"></div>
+        <div class="field"><div class="field-label">Capacidade (kg/h)</div><input type="number" id="maq-cap" value="0" step="0.1"></div>
+        <div class="field"><div class="field-label">Status</div>
+          <div class="seg-ctrl">
+            <div class="seg-btn on" onclick="seg(this,'maq-status','Ativa')">Ativa</div>
+            <div class="seg-btn" onclick="seg(this,'maq-status','Parada')">Parada</div>
+            <div class="seg-btn" onclick="seg(this,'maq-status','Manutenção')">Manutenção</div>
+          </div><input type="hidden" id="maq-status" value="Ativa">
+        </div>
+        <div class="field"><button style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--accent);background:rgba(240,180,41,.1);color:var(--accent);font-size:12px;cursor:pointer" onclick="salvarCadastroMaq()">💾 Salvar cadastro</button></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Registro de produção</div>
+      <div class="field"><div class="field-label">Turno</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'maq-turno','Diurno')">Diurno</div>
+          <div class="seg-btn" onclick="seg(this,'maq-turno','Vespertino')">Vespertino</div>
+          <div class="seg-btn" onclick="seg(this,'maq-turno','Noturno')">Noturno</div>
+        </div><input type="hidden" id="maq-turno" value="Diurno">
+      </div>
+      <div class="field"><div class="field-label">Produção do turno (kg)</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('maq-prod',-10)">−</button>
+          <input class="num-input" type="number" id="maq-prod" value="0" oninput="calcMaq()">
+          <button class="num-btn" onclick="adj('maq-prod',10);calcMaq()">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Tempo de operação (min)</div><input type="number" id="maq-min" value="480" oninput="calcMaq()"></div>
+      <div class="field"><div class="field-label">Quantidade de sacos</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('maq-sacos',-1)">−</button>
+          <input class="num-input" type="number" id="maq-sacos" value="0" oninput="calcMaq()">
+          <button class="num-btn" onclick="adj('maq-sacos',1);calcMaq()">+</button>
+        </div>
+      </div>
+      <div class="field">
+        <div class="calc-box">
+          <div class="calc-title">Calculado automático</div>
+          <div class="calc-row"><span>Vazão kg/min</span><strong id="maq-vmin">0.000</strong></div>
+          <div class="calc-row"><span>Vazão kg/h</span><strong id="maq-vh">0.0</strong></div>
+          <div class="calc-row"><span>kg por saco</span><strong id="maq-kgs">—</strong></div>
+          <div class="calc-row"><span>Projeção 8h</span><strong id="maq-proj">0 kg</strong></div>
+          <div id="maq-dist-row" class="calc-row" style="display:none"><span>→ 50% MaxFort / 50% KEP</span><strong id="maq-dist">0 kg cada</strong></div>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Meta do turno (kg)</div><input type="number" id="maq-meta" value="1000"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="maq-obs" placeholder="Temperatura, pressão, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-maq" onclick="salvar('maquinas')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- ══ GÁS ══ -->
+<div class="form-screen" id="form-gas">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Central de Gás</div><div class="form-subtitle">4 TANQUES</div></div>
+    <div class="form-accent-dot" style="background:#FF7B72"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Nível dos tanques</div>
+      <div class="tank-grid">
+        <div class="tank-item"><div class="tank-name">TANQUE 3093</div><input class="tank-slider" type="range" id="gas-3093" min="0" max="100" value="70" oninput="updateTank('3093')"><div class="tank-pct" id="pct-3093">70%</div><div class="tank-bar"><div class="tank-fill" id="bar-3093" style="width:70%;background:#F0B429"></div></div></div>
+        <div class="tank-item"><div class="tank-name">TANQUE 3095</div><input class="tank-slider" type="range" id="gas-3095" min="0" max="100" value="70" oninput="updateTank('3095')"><div class="tank-pct" id="pct-3095">70%</div><div class="tank-bar"><div class="tank-fill" id="bar-3095" style="width:70%;background:#F0B429"></div></div></div>
+        <div class="tank-item"><div class="tank-name">TANQUE 3096</div><input class="tank-slider" type="range" id="gas-3096" min="0" max="100" value="70" oninput="updateTank('3096')"><div class="tank-pct" id="pct-3096">70%</div><div class="tank-bar"><div class="tank-fill" id="bar-3096" style="width:70%;background:#F0B429"></div></div></div>
+        <div class="tank-item"><div class="tank-name">TANQUE 13595</div><input class="tank-slider" type="range" id="gas-13595" min="0" max="100" value="70" oninput="updateTank('13595')"><div class="tank-pct" id="pct-13595">70%</div><div class="tank-bar"><div class="tank-fill" id="bar-13595" style="width:70%;background:#F0B429"></div></div></div>
+      </div>
+      <div class="field">
+        <div class="calc-box">
+          <div class="calc-title">Consolidado</div>
+          <div class="calc-row"><span>Média geral</span><strong id="gas-media">70%</strong></div>
+          <div class="calc-row"><span>Tanques críticos (&lt;30%)</span><strong id="gas-alertas" style="color:#F85149">0</strong></div>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="gas-obs" placeholder="Pressão, temperatura, ocorrências..."></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-gas" onclick="salvar('gas')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- ══ CARREGAMENTO ══ -->
+<div class="form-screen" id="form-carga">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Carregamento</div><div class="form-subtitle">FROTA ATIVA</div></div>
+    <div class="form-accent-dot" style="background:#79C0FF"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Veículo</div>
+      <div class="field"><div class="field-label">Selecione o veículo</div>
+        <select id="cg-veiculo">
+          <option value="">— selecione —</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Status</div>
+        <div class="seg-ctrl" id="cg-status-ctrl">
+          <div class="seg-btn on" onclick="setCargaStatus(this,'Disponível')">Disponível</div>
+          <div class="seg-btn" onclick="setCargaStatus(this,'Carregando')">Carregando</div>
+          <div class="seg-btn" onclick="setCargaStatus(this,'Em Rota')" id="btn-rota">Em Rota</div>
+          <div class="seg-btn" onclick="setCargaStatus(this,'Manutenção')" id="btn-manut">Manutenção</div>
+        </div><input type="hidden" id="cg-status" value="Disponível">
+      </div>
+      <div class="field"><div class="field-label">Motorista</div><input type="text" id="cg-mot" placeholder="Nome do motorista"></div>
+      <div class="field"><div class="field-label">Equipe de carga</div><input type="text" id="cg-equipe" placeholder="Ex: Equipe Carga 1"></div>
+      <div class="field"><div class="field-label">% Carregado <span id="cg-pct-val">0%</span></div>
+        <input type="range" id="cg-pct" min="0" max="100" step="5" value="0" oninput="document.getElementById('cg-pct-val').textContent=this.value+'%'" style="width:100%;accent-color:var(--accent);margin-top:8px">
+      </div>
+      <div class="field" id="cg-dest-field"><div class="field-label">Destino <span style="color:#F85149;font-size:10px" id="dest-wendel-note">(somente Wendel)</span></div>
+        <input type="text" id="cg-dest" placeholder="Cidade de destino" id="cg-dest">
+      </div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="cg-obs" placeholder="Manifesto, ocorrências..."></textarea></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Veículos em rota / manutenção</div>
+      <div id="cg-ativos-lista" style="padding:8px 0"></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-carga" onclick="salvar('carga')">✓ Salvar e enviar ao Sheets</button></div>
+</div>
+
+<!-- ══ ESTOQUE MP ══ -->
+<div class="form-screen" id="form-estmp">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Estoque MPs</div><div class="form-subtitle">ENTRADA E SAÍDA</div></div>
+    <div class="form-accent-dot" style="background:#D2A8FF"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Movimentação</div>
+      <div class="field"><div class="field-label">Tipo</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'estmp-tipo','Entrada')" style="background:#2EA043;color:#fff;border-color:#2EA043">▲ Entrada</div>
+          <div class="seg-btn" onclick="seg(this,'estmp-tipo','Saída')" style="color:#F85149;border-color:#F85149">▼ Saída</div>
+        </div><input type="hidden" id="estmp-tipo" value="Entrada">
+      </div>
+      <div class="field"><div class="field-label">Matéria-prima</div>
+        <select id="estmp-mp">
+          <option value="">— selecione —</option>
+          <optgroup label="Polietileno"><option>Polietileno Virgem</option><option>PE Reciclado Micronizador</option><option>PE Granulado Azul</option><option>PE Granulado Preto</option></optgroup>
+          <optgroup label="Fibra"><option>Roving</option><option>Resina 3100</option><option>Resina 4210</option><option>Resina 813</option><option>DMA</option><option>Aerosil</option><option>Estireno</option><option>Catalisador DM-50</option><option>Catalisador D45</option><option>Catalisador 500</option><option>Gel Branco</option><option>Gel Laranja</option><option>Cera</option><option>Carbonato</option><option>Titanium</option><option>Rolo de Manta</option><option>Cobalto</option><option>Pasta Branca</option><option>Pasta Preta</option></optgroup>
+          <optgroup label="Pias e Tanques"><option>Areia</option><option>Pigmento Branco</option><option>Pigmento Preto</option><option>Pigmento Cinza</option><option>Pigmento Bege</option><option>Talco Branco</option><option>Talco Cinza</option><option>Pigmento Azul</option><option>Pigmento Laranja</option></optgroup>
+          <optgroup label="EPI / Ferramentas"><option>Luvas de proteção</option><option>Óculos de segurança</option><option>Máscara respiratória</option><option>Pistola de ar</option><option>Pincéis / Rolo fibra</option></optgroup>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">Unidade</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'estmp-un','kg')">kg</div>
+          <div class="seg-btn" onclick="seg(this,'estmp-un','L')">L</div>
+          <div class="seg-btn" onclick="seg(this,'estmp-un','Un')">Un</div>
+          <div class="seg-btn" onclick="seg(this,'estmp-un','Par')">Par</div>
+        </div><input type="hidden" id="estmp-un" value="kg">
+      </div>
+      <div class="field"><div class="field-label">Quantidade</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('estmp-qtd',-1)">−</button>
+          <input class="num-input" type="number" id="estmp-qtd" value="0" min="0">
+          <button class="num-btn" onclick="adj('estmp-qtd',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">NF / Pedido</div><input type="text" id="estmp-nf" placeholder="Ex: NF-001234"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="estmp-obs" placeholder="Fornecedor, lote..."></textarea></div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Últimas movimentações hoje</div>
+      <div id="estmp-hist" style="padding:4px 0"><div style="padding:12px 14px;color:var(--text2);font-size:12px">Nenhuma movimentação hoje.</div></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-estmp" onclick="salvar('estmp')">✓ Registrar movimentação</button></div>
+</div>
+
+<!-- ══ ESTOQUE PRODUTOS ══ -->
+<div class="form-screen" id="form-estprod">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Estoque Produtos</div><div class="form-subtitle">CAIXAS · PIAS · TANQUES</div></div>
+    <div class="form-accent-dot" style="background:#3FB950"></div>
+  </div>
+  <div class="form-body">
+    <div class="form-section">
+      <div class="form-section-title">Movimentação</div>
+      <div class="field"><div class="field-label">Tipo</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'estprod-tipo','Entrada')" style="background:#2EA043;color:#fff;border-color:#2EA043">▲ Entrada</div>
+          <div class="seg-btn" onclick="seg(this,'estprod-tipo','Saída')" style="color:#F85149;border-color:#F85149">▼ Saída</div>
+        </div><input type="hidden" id="estprod-tipo" value="Entrada">
+      </div>
+      <div class="field"><div class="field-label">Categoria</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'estprod-cat','CxPE');renderProdSelect()">Cx PE</div>
+          <div class="seg-btn" onclick="seg(this,'estprod-cat','CxFibra');renderProdSelect()">Cx Fibra</div>
+          <div class="seg-btn" onclick="seg(this,'estprod-cat','PiasTanques');renderProdSelect()">Pias/Tanques</div>
+        </div><input type="hidden" id="estprod-cat" value="CxPE">
+      </div>
+      <div class="field"><div class="field-label">Produto</div><select id="estprod-prod"></select></div>
+      <div class="field" id="estprod-cor-field" style="display:none"><div class="field-label">Cor</div>
+        <div class="seg-ctrl">
+          <div class="seg-btn on" onclick="seg(this,'estprod-cor','Branco')" style="background:#f0f0f0;color:#000;border-color:#ddd">Branco</div>
+          <div class="seg-btn" onclick="seg(this,'estprod-cor','Bege')" style="background:#c8a882;color:#fff;border-color:#c8a882">Bege</div>
+          <div class="seg-btn" onclick="seg(this,'estprod-cor','Cinza')" style="background:#888;color:#fff;border-color:#888">Cinza</div>
+          <div class="seg-btn" onclick="seg(this,'estprod-cor','Preto')" style="background:#222;color:#fff;border-color:#444">Preto</div>
+        </div><input type="hidden" id="estprod-cor" value="Branco">
+      </div>
+      <div class="field"><div class="field-label">Quantidade</div>
+        <div class="num-row">
+          <button class="num-btn" onclick="adj('estprod-qtd',-1)">−</button>
+          <input class="num-input" type="number" id="estprod-qtd" value="0" min="0">
+          <button class="num-btn" onclick="adj('estprod-qtd',1)">+</button>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">Destino / Origem</div><input type="text" id="estprod-dest" placeholder="Ex: Cliente / Produção MaxFort"></div>
+      <div class="field"><div class="field-label">Observações</div><textarea id="estprod-obs"></textarea></div>
+    </div>
+  </div>
+  <div class="submit-bar"><button class="submit-btn" id="btn-estprod" onclick="salvar('estprod')">✓ Registrar</button></div>
+</div>
+
+<!-- ══ DASHBOARD (só Wendel) ══ -->
+<div class="form-screen" id="form-dashboard">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Dashboard</div><div class="form-subtitle">PAINEL EXECUTIVO — WENDEL</div></div>
+    <div class="form-accent-dot" style="background:var(--accent)"></div>
+  </div>
+  <div class="form-body" id="dash-body">
+    <div style="padding:20px;text-align:center;color:var(--text2)">Carregando dados...</div>
+  </div>
+</div>
+
+<!-- ══ REGISTROS ══ -->
+<div class="form-screen" id="form-saved">
+  <div class="form-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div><div class="form-title">Registros de hoje</div><div class="form-subtitle" id="saved-subtitle">0 registros</div></div>
+  </div>
+  <div class="form-body">
+    <div id="saved-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ CONSTANTES ══
+const USUARIOS = {Maria:'1234',Niltonei:'5678',Marcio:'abcd',Nelio:'efgh',Wendel:'2710'};
+const WPP_FIXO = '5577988260805';
+const SHEETS_URL_FIXA = 'https://script.google.com/macros/library/d/1pdQMc7oA6hhOaWalfaYuEHYn9vgsqOcW1zPuc5r1k2pVFIe9bSrhGBqq/2';
+const FROTA_COMPLETA = [
+  'MB 16-20 L · DDX-4B56','MB 16-20 L · CYR-3I40',
+  'MB ACCELO 13-16 · PXX-1I49','MB ACCELO 13-16 · RCO-5D97',
+  'FORD CARGO 11-19 · EZZ-6F69','FORD CARGO 816 · PLQ-3J31',
+  'FORD CARGO 816 · PJI-7C73','VW 8-150 · GZG-0C29',
+  'FORD F-4000 · JRZ-9J30','FORD F-2000 · CTH-3D64',
+  'FORD F-1000 · BTB-7B65','MB 11-14 · KMJ4A38',
+  'SCANIA P360 Carreta · OZP-3D60'
+];
+
+const hoje = new Date();
+const dataHoje = hoje.toLocaleDateString('pt-BR');
+const diasNome = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+let usuarioAtual = null;
+let registros = JSON.parse(localStorage.getItem('pcp_reg_'+dataHoje)||'[]');
+// Estado de veículos (persiste entre dias)
+let veiculosStatus = JSON.parse(localStorage.getItem('pcp_veiculos')||'{}');
+// Fila de pintura (persiste)
+let filaPintura = JSON.parse(localStorage.getItem('pcp_pintura')||'{}');
+// Cadastro de máquinas
+let cadastroMaq = JSON.parse(localStorage.getItem('pcp_maquinas')||'{}');
+
+function saveReg(){ localStorage.setItem('pcp_reg_'+dataHoje, JSON.stringify(registros)); }
+function saveVeiculos(){ localStorage.setItem('pcp_veiculos', JSON.stringify(veiculosStatus)); }
+function savePintura(){ localStorage.setItem('pcp_pintura', JSON.stringify(filaPintura)); }
+function saveMaquinas(){ localStorage.setItem('pcp_maquinas', JSON.stringify(cadastroMaq)); }
+
+// ══ LOGIN ══
+function fazerLogin(){
+  const user = document.getElementById('login-user').value;
+  const pass = document.getElementById('login-pass').value.trim();
+  const erroEl = document.getElementById('login-error');
+  if(!user){ erroEl.textContent='Selecione um usuário.'; return; }
+  if(!pass){ erroEl.textContent='Digite a senha.'; return; }
+  if(USUARIOS[user] !== pass){ erroEl.textContent='Senha incorreta.'; document.getElementById('login-pass').value=''; return; }
+  usuarioAtual = user;
+  erroEl.textContent='';
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('home').style.display='flex';
+  document.getElementById('user-badge').textContent=user;
+  document.getElementById('home-date-txt').textContent=diasNome[hoje.getDay()]+' '+dataHoje;
+  // Config: só Wendel vê
+  document.getElementById('config-panel').style.display = user==='Wendel' ? 'block':'none';
+  // Destino no carregamento: só Wendel preenche
+  const destInput = document.getElementById('cg-dest');
+  if(destInput) destInput.disabled = user!=='Wendel';
+  // Status Em Rota e Manutenção: só Wendel
+  const btnRota = document.getElementById('btn-rota');
+  const btnManut = document.getElementById('btn-manut');
+  if(btnRota) btnRota.style.display = user==='Wendel'?'':'none';
+  if(btnManut) btnManut.style.display = user==='Wendel'?'':'none';
+  // Cadastro máquinas: só Wendel
+  document.getElementById('maq-cadastro-panel').style.display = user==='Wendel'?'block':'none';
+  renderSetores();
+  renderFrotaSelect();
+  atualizarBadges();
+  renderProdSelect();
+}
+
+function fazerLogout(){
+  usuarioAtual=null;
+  document.getElementById('home').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-pass').value='';
+  document.getElementById('login-user').value='';
+}
+
+// ══ SETORES (grid dinâmico) ══
+const SETORES_DEF = [
+  {id:'poly',    icon:'📦', name:'Polietileno',        sub:'3 turnos · MaxFort · KEP',  color:'#58A6FF', todos:true},
+  {id:'fibra',   icon:'🏗️', name:'Fibra',              sub:'Caixa · Tampa · Multiuso',  color:'#3FB950', todos:true},
+  {id:'pt',      icon:'🚿', name:'Pias e Tanques',      sub:'4 cores · Equipes',         color:'#D2A8FF', todos:true},
+  {id:'pintura', icon:'🎨', name:'Pintura',             sub:'Fila de caixas',            color:'#FF9900', todos:true},
+  {id:'maquinas',icon:'⚡', name:'Máquinas',            sub:'Micronizadores · Extrusora',color:'#F0B429', todos:true},
+  {id:'gas',     icon:'🔥', name:'Central de Gás',      sub:'4 tanques',                 color:'#FF7B72', todos:true},
+  {id:'carga',   icon:'🚛', name:'Carregamento',        sub:'Frota ativa',               color:'#79C0FF', todos:true},
+  {id:'estmp',   icon:'📦', name:'Estoque MPs',         sub:'Entrada · Saída',           color:'#D2A8FF', todos:true},
+  {id:'estprod', icon:'🏭', name:'Estoque Produtos',    sub:'Cx · Pias · Tanques',       color:'#3FB950', todos:true},
+  {id:'dashboard',icon:'📊',name:'Dashboard',           sub:'Painel executivo',          color:'#F0B429', todos:false},
+];
+
+function renderSetores(){
+  const grid = document.getElementById('setores-grid');
+  grid.innerHTML = SETORES_DEF
+    .filter(s => s.todos || usuarioAtual==='Wendel')
+    .map(s=>`<div class="setor-card" style="--card-color:${s.color}" onclick="openForm('${s.id}')">
+      <div class="setor-badge" id="badge-${s.id}">0</div>
+      <div class="setor-icon">${s.icon}</div>
+      <div class="setor-name">${s.name}</div>
+      <div class="setor-sub">${s.sub}</div>
+    </div>`).join('');
+}
+
+function atualizarBadges(){
+  SETORES_DEF.forEach(s=>{
+    const el=document.getElementById('badge-'+s.id);
+    if(el) el.textContent=registros.filter(r=>r.setor===s.id).length;
+  });
+  document.getElementById('saved-count').textContent=registros.length;
+  const pend=registros.filter(r=>!r.enviado).length;
+  document.getElementById('pendentes-count').textContent=pend;
+  document.getElementById('btn-reenviar').style.display=pend>0?'flex':'none';
+}
+
+// ══ FROTA ══
+function veiculosDisponiveis(){
+  return FROTA_COMPLETA.filter(v=>{
+    const st=veiculosStatus[v];
+    return !st || st==='Disponível' || st==='Carregando';
+  });
+}
+
+function renderFrotaSelect(){
+  const sel=document.getElementById('cg-veiculo');
+  if(!sel)return;
+  const disp=veiculosDisponiveis();
+  sel.innerHTML='<option value="">— selecione —</option>'+disp.map(v=>`<option>${v}</option>`).join('');
+  // Lista de ativos (em rota/manutenção)
+  const lista=document.getElementById('cg-ativos-lista');
+  if(!lista)return;
+  const ativos=FROTA_COMPLETA.filter(v=>veiculosStatus[v]==='Em Rota'||veiculosStatus[v]==='Manutenção');
+  if(!ativos.length){lista.innerHTML='<div style="padding:10px 14px;color:var(--text2);font-size:12px">Nenhum veículo em rota ou manutenção.</div>';return;}
+  lista.innerHTML=ativos.map(v=>{
+    const st=veiculosStatus[v];
+    const tagCls=st==='Em Rota'?'tag-blue':'tag-warn';
+    let retBtnHtml='';
+    if(usuarioAtual==='Wendel'){
+      retBtnHtml=`<button style="font-size:10px;padding:4px 9px;border-radius:6px;border:1px solid var(--green);background:rgba(46,160,67,.1);color:#3FB950;cursor:pointer" onclick="retornarVeiculo('${v}')">Dar entrada</button>`;
+    }
+    return`<div class="dash-row"><span class="dash-label">${v}</span><div style="display:flex;align-items:center;gap:6px"><span class="tag ${tagCls}">${st}</span>${retBtnHtml}</div></div>`;
+  }).join('');
+}
+
+function setCargaStatus(el,val){
+  el.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('cg-status').value=val;
+}
+
+function retornarVeiculo(v){
+  if(usuarioAtual!=='Wendel'){showToast('Apenas Wendel pode fazer isso','err');return;}
+  veiculosStatus[v]='Disponível';
+  saveVeiculos();
+  renderFrotaSelect();
+  showToast('✓ Veículo '+v.split('·')[1].trim()+' disponível','ok');
+}
+
+// ══ PINTURA ══
+function adicionarPintura(produto, qtd){
+  if(!produto||!qtd)return;
+  filaPintura[produto]=(filaPintura[produto]||0)+qtd;
+  savePintura();
+}
+
+function renderPintura(){
+  const lista=document.getElementById('pintura-lista');
+  const sel=document.getElementById('pint-prod');
+  const itens=Object.entries(filaPintura).filter(([,v])=>v>0);
+  if(!itens.length){
+    lista.innerHTML='<div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">Nenhuma caixa aguardando pintura. ✅</div>';
+    if(sel) sel.innerHTML='<option value="">— sem itens na fila —</option>';
+    return;
+  }
+  lista.innerHTML=itens.map(([prod,qtd])=>`
+    <div class="pintura-item">
+      <div><div class="pintura-nome">${prod}</div><div style="font-size:10px;color:var(--text2)">Aguardando pintura</div></div>
+      <div style="text-align:right"><div class="pintura-qtd">${qtd}</div><div style="font-size:10px;color:var(--text2)">un</div></div>
+    </div>`).join('');
+  if(sel) sel.innerHTML=itens.map(([prod])=>`<option>${prod}</option>`).join('');
+}
+
+function darBaixaPintura(){
+  const prod=document.getElementById('pint-prod').value;
+  const qtd=parseInt(document.getElementById('pint-qtd').value)||0;
+  const obs=document.getElementById('pint-obs').value;
+  if(!prod||!qtd){showToast('Selecione o produto e a quantidade','err');return;}
+  if((filaPintura[prod]||0)<qtd){showToast('Quantidade maior que o saldo!','err');return;}
+  filaPintura[prod]-=qtd;
+  if(filaPintura[prod]<=0)delete filaPintura[prod];
+  savePintura();
+  const data={setor:'pintura',data:dataHoje,hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),usuario:usuarioAtual,produto:prod,qtd_pintada:qtd,obs};
+  data.id=Date.now(); data.enviado=false;
+  registros.push(data); saveReg();
+  enviarSheets(data).then(ok=>{if(ok)data.enviado=true;saveReg();});
+  renderPintura();
+  document.getElementById('pint-qtd').value=0;
+  showToast('✓ Baixa registrada!','ok');
+}
+
+// ══ MÁQUINAS ══
+function renderMaqForm(){
+  const sel=document.getElementById('maq-sel').value;
+  const info=cadastroMaq[sel]||{};
+  if(usuarioAtual==='Wendel'){
+    document.getElementById('maq-nome').value=info.nome||'';
+    document.getElementById('maq-cap').value=info.cap||0;
+  }
+  // Mostrar distribuição PE apenas para micronizadores
+  const distRow=document.getElementById('maq-dist-row');
+  if(distRow) distRow.style.display=sel.startsWith('micro')?'flex':'none';
+}
+
+function salvarCadastroMaq(){
+  if(usuarioAtual!=='Wendel'){showToast('Apenas Wendel pode cadastrar máquinas','err');return;}
+  const sel=document.getElementById('maq-sel').value;
+  cadastroMaq[sel]={nome:document.getElementById('maq-nome').value,cap:+document.getElementById('maq-cap').value,status:document.getElementById('maq-status').value};
+  saveMaquinas();
+  showToast('✓ Cadastro salvo!','ok');
+}
+
+function calcMaq(){
+  const prod=parseFloat(document.getElementById('maq-prod').value)||0;
+  const min=parseFloat(document.getElementById('maq-min').value)||1;
+  const sacos=parseInt(document.getElementById('maq-sacos').value)||0;
+  const vmin=prod/min; const vh=vmin*60; const proj=vh*8;
+  document.getElementById('maq-vmin').textContent=vmin.toFixed(3);
+  document.getElementById('maq-vh').textContent=vh.toFixed(1);
+  document.getElementById('maq-kgs').textContent=sacos>0?(prod/sacos).toFixed(1):'—';
+  document.getElementById('maq-proj').textContent=Math.round(proj)+' kg';
+  document.getElementById('maq-dist').textContent=Math.round(proj/2)+' kg cada';
+}
+
+// ══ DASHBOARD ══
+function renderDashboard(){
+  const body=document.getElementById('dash-body');
+  const polys=registros.filter(r=>r.setor==='poly');
+  const fibras=registros.filter(r=>r.setor==='fibra');
+  const pts=registros.filter(r=>r.setor==='pt');
+  const maqs=registros.filter(r=>r.setor==='maquinas');
+  const gases=registros.filter(r=>r.setor==='gas');
+  const cargas=registros.filter(r=>r.setor==='carga');
+  const estmps=registros.filter(r=>r.setor==='estmp');
+  const pinturas=registros.filter(r=>r.setor==='pintura');
+
+  const totPoly=polys.reduce((a,r)=>a+(r.total_cx||0),0);
+  const totFibra=fibras.reduce((a,r)=>a+(r.qtd||0),0)+fibras.reduce((a,r)=>a+(r.multi_qtd||0),0);
+  const totPT=pts.reduce((a,r)=>a+(r.qtd||0),0);
+  const totMaq=maqs.reduce((a,r)=>a+(r.prod_kg||0),0);
+  const gasUlt=gases.length?gases[gases.length-1]:null;
+  const gasMedia=gasUlt?Math.round([gasUlt.t3093,gasUlt.t3095,gasUlt.t3096,gasUlt.t13595].reduce((a,b)=>a+b,0)/4):null;
+  const gasCrit=gasUlt?[gasUlt.t3093,gasUlt.t3095,gasUlt.t3096,gasUlt.t13595].filter(v=>v<30).length:0;
+  const avPoly=polys.reduce((a,r)=>a+(r.avaria_qtd||0),0);
+  const avFibra=fibras.reduce((a,r)=>a+(r.avaria_qtd||0),0);
+  const avPT=pts.reduce((a,r)=>a+(r.avaria_qtd||0),0);
+  const totPintura=Object.values(filaPintura).reduce((a,b)=>a+b,0);
+  const emRota=FROTA_COMPLETA.filter(v=>veiculosStatus[v]==='Em Rota');
+  const emManut=FROTA_COMPLETA.filter(v=>veiculosStatus[v]==='Manutenção');
+  const dispVeic=FROTA_COMPLETA.length-emRota.length-emManut.length;
+
+  body.innerHTML=`
+  <div class="dash-grid">
+    <div class="kpi-card ${totPoly>0?'good':''}"><div class="kpi-label">Caixas PE</div><div class="kpi-value">${totPoly}<span class="kpi-unit"> cx</span></div></div>
+    <div class="kpi-card ${totFibra>0?'good':''}"><div class="kpi-label">Caixas Fibra</div><div class="kpi-value">${totFibra}<span class="kpi-unit"> un</span></div></div>
+    <div class="kpi-card ${totPT>0?'good':''}"><div class="kpi-label">Pias/Tanques</div><div class="kpi-value">${totPT}<span class="kpi-unit"> un</span></div></div>
+    <div class="kpi-card ${totPintura>0?'alert':'good'}"><div class="kpi-label">Fila Pintura</div><div class="kpi-value">${totPintura}<span class="kpi-unit"> cx</span></div></div>
+    <div class="kpi-card ${gasCrit>0?'alert':'good'}"><div class="kpi-label">Gás médio</div><div class="kpi-value">${gasMedia!==null?gasMedia+'%':'—'}</div></div>
+    <div class="kpi-card ${emManut.length>0?'alert':''}"><div class="kpi-label">Frota OK</div><div class="kpi-value">${dispVeic}<span class="kpi-unit"> / ${FROTA_COMPLETA.length}</span></div></div>
+    <div class="kpi-card ${avPoly+avFibra+avPT>0?'alert':'good'}"><div class="kpi-label">Avarias</div><div class="kpi-value">${avPoly+avFibra+avPT}<span class="kpi-unit"> un</span></div></div>
+    <div class="kpi-card"><div class="kpi-label">Micronizadores</div><div class="kpi-value">${totMaq}<span class="kpi-unit"> kg</span></div></div>
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-section-title">📦 Polietileno — por tamanho</div>
+    ${['310L','500L','1.000L','2.000L'].map(t=>{
+      const v=polys.reduce((a,r)=>a+(r['cx_'+t.replace('.','').replace('L','')]||0),0);
+      return v>0?`<div class="dash-row"><span class="dash-label">${t}</span><span class="dash-value ok">${v} cx</span></div>`:'';
+    }).join('')||'<div class="dash-row"><span class="dash-label">Sem registro</span></div>'}
+    ${avPoly>0?`<div class="dash-row"><span class="dash-label">⚠️ Com avaria</span><span class="dash-value danger">${avPoly} cx</span></div>`:''}
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-section-title">🏗️ Fibra — por produto</div>
+    ${(()=>{const mp={};fibras.forEach(r=>{if(r.produto&&r.qtd)mp[r.produto]=(mp[r.produto]||0)+r.qtd;if(r.multi_prod&&r.multi_qtd)mp[r.multi_prod]=(mp[r.multi_prod]||0)+r.multi_qtd;});return Object.entries(mp).filter(([,v])=>v>0).map(([k,v])=>`<div class="dash-row"><span class="dash-label">${k}</span><span class="dash-value ok">${v} un</span></div>`).join('')||'<div class="dash-row"><span class="dash-label">Sem registro</span></div>';})()}
+    ${avFibra>0?`<div class="dash-row"><span class="dash-label">⚠️ Com avaria</span><span class="dash-value danger">${avFibra} un</span></div>`:''}
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-section-title">🚿 Pias e Tanques — por cor</div>
+    ${['Branco','Bege','Cinza','Preto'].map(cor=>{
+      const v=pts.filter(r=>r.cor===cor).reduce((a,r)=>a+(r.qtd||0),0);
+      return v>0?`<div class="dash-row"><span class="dash-label">${cor}</span><span class="dash-value ok">${v} un</span></div>`:'';
+    }).join('')||'<div class="dash-row"><span class="dash-label">Sem registro</span></div>'}
+    ${avPT>0?`<div class="dash-row"><span class="dash-label">⚠️ Com avaria</span><span class="dash-value danger">${avPT} un</span></div>`:''}
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-section-title">🎨 Pintura — fila atual</div>
+    ${Object.entries(filaPintura).filter(([,v])=>v>0).map(([k,v])=>`<div class="dash-row"><span class="dash-label">${k}</span><span class="dash-value warn">${v} cx aguardando</span></div>`).join('')||'<div class="dash-row"><span class="dash-label dash-value ok">Fila vazia ✅</span></div>'}
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-section-title">🔥 Central de Gás</div>
+    ${gasUlt?['3093','3095','3096','13595'].map(t=>{
+      const v=gasUlt['t'+t]||0;
+      const cls=v>=60?'ok':v>=30?'warn':'danger';
+      return`<div class="dash-row"><span class="dash-label">Tanque ${t}</span><span class="dash-value ${cls}">${v}% ${v<30?'⚠️':''}</span></div>`;
+    }).join(''):'<div class="dash-row"><span class="dash-label">Sem registro hoje</span></div>'}
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-section-title">🚛 Frota</div>
+    <div class="dash-row"><span class="dash-label">Disponíveis</span><span class="dash-value ok">${dispVeic}</span></div>
+    <div class="dash-row"><span class="dash-label">Em Rota</span><span class="dash-value" style="color:#58A6FF">${emRota.length}</span></div>
+    ${emRota.map(v=>`<div class="dash-row" style="padding-left:24px"><span class="dash-label">${v.split('·')[1]?.trim()||v}</span><span class="tag tag-blue">Em Rota</span></div>`).join('')}
+    <div class="dash-row"><span class="dash-label">Manutenção</span><span class="dash-value warn">${emManut.length}</span></div>
+    ${emManut.map(v=>`<div class="dash-row" style="padding-left:24px"><span class="dash-label">${v.split('·')[1]?.trim()||v}</span><span class="tag tag-warn">Manutenção</span></div>`).join('')}
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-section-title">⚡ Máquinas</div>
+    ${maqs.length?maqs.map(r=>`<div class="dash-row"><span class="dash-label">${r.maquina_sel||'Máquina'} · ${r.turno}</span><span class="dash-value ok">${r.prod_kg} kg · ${r.vazao_min} kg/min</span></div>`).join(''):'<div class="dash-row"><span class="dash-label">Sem registro hoje</span></div>'}
+  </div>
+
+  <div class="dash-section">
+    <div class="dash-section-title">📦 Estoque MPs — movimentações hoje</div>
+    ${estmps.length?estmps.map(r=>`<div class="dash-row"><span class="dash-label">${r.mp}</span><span class="dash-value ${r.tipo_mov==='Entrada'?'ok':'danger'}">${r.tipo_mov==='Entrada'?'+':'-'}${r.qtd} ${r.un}</span></div>`).join(''):'<div class="dash-row"><span class="dash-label">Sem movimentação hoje</span></div>'}
+  </div>
+
+  <div style="padding:12px 0;text-align:center;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace">
+    Atualizado em ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})} · ${registros.length} registros hoje
+  </div>`;
+}
+
+// ══ HELPERS UI ══
+function seg(el,hiddenId,val){
+  el.parentElement.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById(hiddenId).value=val;
+}
+function adj(id,delta){
+  const el=document.getElementById(id);
+  el.value=Math.max(0,(parseFloat(el.value)||0)+delta);
+  if(id==='poly-ciclos') calcPoly();
+  if(['maq-prod','maq-sacos'].includes(id)) calcMaq();
+}
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function calcPoly(){
+  const c=parseInt(document.getElementById('poly-ciclos').value)||0;
+  const m310=parseInt(document.getElementById('mol-310').value)||0;
+  const m500=parseInt(document.getElementById('mol-500').value)||0;
+  const m1k=parseInt(document.getElementById('mol-1k').value)||0;
+  const m2k=parseInt(document.getElementById('mol-2k').value)||0;
+  document.getElementById('res-310').textContent=(c*m310)+' cx';
+  document.getElementById('res-500').textContent=(c*m500)+' cx';
+  document.getElementById('res-1k').textContent=(c*m1k)+' cx';
+  document.getElementById('res-2k').textContent=(c*m2k)+' cx';
+  document.getElementById('res-tot').textContent=(c*(m310+m500+m1k+m2k))+' cx';
+}
+
+function updateTank(id){
+  const v=document.getElementById('gas-'+id).value;
+  const col=v>=60?'#3FB950':v>=30?'#F0B429':'#F85149';
+  document.getElementById('pct-'+id).textContent=v+'%';
+  document.getElementById('pct-'+id).style.color=col;
+  document.getElementById('bar-'+id).style.width=v+'%';
+  document.getElementById('bar-'+id).style.background=col;
+  const ids=['3093','3095','3096','13595'];
+  const vals=ids.map(i=>parseInt(document.getElementById('gas-'+i).value));
+  document.getElementById('gas-media').textContent=Math.round(vals.reduce((a,b)=>a+b,0)/4)+'%';
+  document.getElementById('gas-alertas').textContent=vals.filter(v=>v<30).length;
+}
+
+const PRODS_CXPE=['Cx PE 310L — MaxFort','Cx PE 500L — MaxFort','Cx PE 1.000L — MaxFort','Cx PE 2.000L — MaxFort','Cx PE 310L — KEP','Cx PE 500L — KEP','Cx PE 1.000L — KEP','Cx PE 2.000L — KEP'];
+const PRODS_CXFB=['Cx 250L Fibra','Cx 500L Fibra','Cx 1.000L Mod.Alta','Cx 1.000L Mod.Baixa','Cx 2.000L Mod.Alta','Cx 2.000L Mod.Baixa','Cx 3.000L Fibra','Cx 5.000L Fibra','Cx 10.000L Fibra','Cx 12.000L Fibra','Cx 15.000L Fibra','Cx 20.000L Fibra','Tampa Cx 250L','Tampa Cx 500L','Tampa Cx 1.000L','Tampa Cx 2.000L','Tampa Cx 5.000L','Tampa Cx 10.000L'];
+const PRODS_PT=['Cuba 60x60','Pia 85x50','Pia 100x50','Pia 120x50','Pia 140x50','Tanque Duplo 100x50','Tanque Duplo 110x55','Tanque Duplo 120x60','Tanque Duplo 140x70','Tanque Duplo 160x70','Tanque Triplo 140x50','Tanque Triplo 160x54','Tanque Triplo 180x70','Tanque Bojo 100x50'];
+
+function renderProdSelect(){
+  const cat=document.getElementById('estprod-cat')?.value||'CxPE';
+  const sel=document.getElementById('estprod-prod');
+  const corField=document.getElementById('estprod-cor-field');
+  if(!sel)return;
+  const prods=cat==='CxPE'?PRODS_CXPE:cat==='CxFibra'?PRODS_CXFB:PRODS_PT;
+  sel.innerHTML=prods.map(p=>`<option>${p}</option>`).join('');
+  if(corField) corField.style.display=cat==='PiasTanques'?'block':'none';
+}
+
+// ══ ENVIO SHEETS ══
+async function enviarSheets(data){
+  try{
+    await fetch(SHEETS_URL_FIXA,{method:'POST',body:JSON.stringify(data),mode:'no-cors'});
+    return true;
+  }catch(e){return false;}
+}
+
+async function reenviarPendentes(){
+  const pend=registros.filter(r=>!r.enviado);
+  if(!pend.length){showToast('Nenhum pendente','ok');return;}
+  showToast('Reenviando...','info');
+  for(const r of pend){const ok=await enviarSheets(r);if(ok)r.enviado=true;}
+  saveReg();atualizarBadges();
+  showToast('Registros reenviados!','ok');
+}
+
+// ══ SALVAR ══
+async function salvar(tipo){
+  const btn=document.getElementById('btn-'+tipo);
+  if(btn){btn.disabled=true;btn.innerHTML='<div class="spinner"></div> Enviando...';}
+  const data={setor:tipo,data:dataHoje,hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),usuario:usuarioAtual};
+
+  if(tipo==='poly'){
+    const c=parseInt(document.getElementById('poly-ciclos').value)||0;
+    const m310=parseInt(document.getElementById('mol-310').value)||0;
+    const m500=parseInt(document.getElementById('mol-500').value)||0;
+    const m1k=parseInt(document.getElementById('mol-1k').value)||0;
+    const m2k=parseInt(document.getElementById('mol-2k').value)||0;
+    const pint=parseInt(document.getElementById('poly-pint').value)||0;
+    const avQtd=parseInt(document.getElementById('poly-avaria').value)||0;
+    Object.assign(data,{turno:document.getElementById('poly-turno').value,maquina:document.getElementById('poly-maq').value,carro:document.getElementById('poly-carro').value,operador:document.getElementById('poly-op').value,equipe:document.getElementById('poly-equipe').value,ciclos:c,mol_310:m310,mol_500:m500,mol_1000:m1k,mol_2000:m2k,cx_310:c*m310,cx_500:c*m500,cx_1000:c*m1k,cx_2000:c*m2k,total_cx:c*(m310+m500+m1k+m2k),pintura:pint,mat_kg:parseFloat(document.getElementById('poly-mat').value)||0,desp_kg:parseFloat(document.getElementById('poly-desp').value)||0,meta:parseInt(document.getElementById('poly-meta').value)||0,avaria_tipo:document.getElementById('poly-avaria-tipo').value,avaria_tam:document.getElementById('poly-av-tam').value,avaria_qtd:avQtd,obs:document.getElementById('poly-obs').value});
+    // Adicionar à fila de pintura
+    if(pint>0){
+      const prod=`Cx PE ${document.getElementById('poly-maq').value}`;
+      adicionarPintura(prod,pint);
+    }
+  } else if(tipo==='fibra'){
+    const pint=parseInt(document.getElementById('fibra-pint').value)||0;
+    const avQtd=parseInt(document.getElementById('fibra-avaria').value)||0;
+    Object.assign(data,{turno:document.getElementById('fibra-turno').value,equipe:document.getElementById('fibra-equipe').value,produto:document.getElementById('fibra-prod').value,tipo_prod:document.getElementById('fibra-tipo').value,qtd:parseInt(document.getElementById('fibra-qtd').value)||0,pintura:pint,multi_prod:document.getElementById('fibra-multi').value,multi_qtd:parseInt(document.getElementById('fibra-muli').value)||0,avaria_prod:document.getElementById('fibra-av-prod').value,avaria_qtd:avQtd,resina_kg:parseFloat(document.getElementById('fb-resina').value)||0,roving_kg:parseFloat(document.getElementById('fb-roving').value)||0,catal_l:parseFloat(document.getElementById('fb-catal').value)||0,gel_l:parseFloat(document.getElementById('fb-gel').value)||0,estireno_l:parseFloat(document.getElementById('fb-est').value)||0,carbonato_kg:parseFloat(document.getElementById('fb-carb').value)||0,desp_kg:parseFloat(document.getElementById('fb-desp').value)||0,obs:document.getElementById('fibra-obs').value});
+    if(pint>0){
+      const prod=document.getElementById('fibra-prod').value||'Cx Fibra';
+      adicionarPintura(prod,pint);
+    }
+  } else if(tipo==='pt'){
+    Object.assign(data,{turno:document.getElementById('pt-turno').value,equipe:document.getElementById('pt-equipe').value,produto:document.getElementById('pt-prod').value,cor:document.getElementById('pt-cor').value,qtd:parseInt(document.getElementById('pt-qtd').value)||0,meta:parseInt(document.getElementById('pt-meta').value)||0,avaria_prod:document.getElementById('pt-av-prod').value,avaria_cor:document.getElementById('pt-av-cor').value,avaria_qtd:parseInt(document.getElementById('pt-avaria').value)||0,areia_kg:parseFloat(document.getElementById('pt-areia').value)||0,roving_kg:parseFloat(document.getElementById('pt-roving').value)||0,resina_un:parseFloat(document.getElementById('pt-resina').value)||0,pig_branco:parseFloat(document.getElementById('pt-pig-b').value)||0,pig_preto:parseFloat(document.getElementById('pt-pig-p').value)||0,pig_cinza:parseFloat(document.getElementById('pt-pig-c').value)||0,pig_bege:parseFloat(document.getElementById('pt-pig-bg').value)||0,desp_kg:parseFloat(document.getElementById('pt-desp').value)||0,obs:document.getElementById('pt-obs').value});
+  } else if(tipo==='maquinas'){
+    const sel=document.getElementById('maq-sel').value;
+    const prod=parseFloat(document.getElementById('maq-prod').value)||0;
+    const min=parseFloat(document.getElementById('maq-min').value)||1;
+    const sacos=parseInt(document.getElementById('maq-sacos').value)||0;
+    Object.assign(data,{maquina_sel:sel,turno:document.getElementById('maq-turno').value,prod_kg:prod,tempo_min:min,sacos,vazao_min:+(prod/min).toFixed(3),vazao_hora:+((prod/min)*60).toFixed(1),meta_kg:parseFloat(document.getElementById('maq-meta').value)||0,obs:document.getElementById('maq-obs').value});
+  } else if(tipo==='gas'){
+    Object.assign(data,{t3093:parseInt(document.getElementById('gas-3093').value),t3095:parseInt(document.getElementById('gas-3095').value),t3096:parseInt(document.getElementById('gas-3096').value),t13595:parseInt(document.getElementById('gas-13595').value),obs:document.getElementById('gas-obs').value});
+  } else if(tipo==='carga'){
+    const veiculo=document.getElementById('cg-veiculo').value;
+    const status=document.getElementById('cg-status').value;
+    const dest=usuarioAtual==='Wendel'?document.getElementById('cg-dest').value:'';
+    // Atualizar status do veículo
+    if(veiculo){veiculosStatus[veiculo]=status;saveVeiculos();}
+    Object.assign(data,{veiculo,status,motorista:document.getElementById('cg-mot').value,equipe:document.getElementById('cg-equipe').value,pct_carg:document.getElementById('cg-pct').value,destino:dest,obs:document.getElementById('cg-obs').value});
+  } else if(tipo==='estmp'){
+    Object.assign(data,{tipo_mov:document.getElementById('estmp-tipo').value,mp:document.getElementById('estmp-mp').value,un:document.getElementById('estmp-un').value,qtd:parseFloat(document.getElementById('estmp-qtd').value)||0,nf:document.getElementById('estmp-nf').value,obs:document.getElementById('estmp-obs').value});
+  } else if(tipo==='estprod'){
+    const cat=document.getElementById('estprod-cat').value;
+    Object.assign(data,{tipo_mov:document.getElementById('estprod-tipo').value,categoria:cat,produto:document.getElementById('estprod-prod').value,cor:cat==='PiasTanques'?document.getElementById('estprod-cor').value:'',qtd:parseInt(document.getElementById('estprod-qtd').value)||0,destino:document.getElementById('estprod-dest').value,obs:document.getElementById('estprod-obs').value});
+  }
+
+  const enviado=await enviarSheets(data);
+  data.enviado=enviado; data.id=Date.now();
+  registros.push(data); saveReg();
+  if(btn){btn.disabled=false;btn.innerHTML='✓ Salvar e enviar ao Sheets';}
+  showToast(enviado?'✓ Enviado ao Sheets!':'✓ Salvo localmente',enviado?'ok':'info');
+  setTimeout(goHome,1100);
+}
+
+// ══ WHATSAPP ══
+function enviarWhatsApp(){
+  if(!registros.length){showToast('Nenhum registro hoje','err');return;}
+  const polys=registros.filter(r=>r.setor==='poly');
+  const fibras=registros.filter(r=>r.setor==='fibra');
+  const pts=registros.filter(r=>r.setor==='pt');
+  const maqs=registros.filter(r=>r.setor==='maquinas');
+  const gases=registros.filter(r=>r.setor==='gas');
+  const estmps=registros.filter(r=>r.setor==='estmp');
+  const linhas=[];
+  linhas.push('📊 *PCP MESTRE — RESUMO DO DIA*');
+  linhas.push('📅 *'+dataHoje+'*'+(usuarioAtual?' | 👤 '+usuarioAtual:''));
+  linhas.push('═══════════════════════');
+  linhas.push('');
+  if(polys.length){
+    linhas.push('📦 *POLIETILENO*');
+    const t310=polys.reduce((a,r)=>a+(r.cx_310||0),0);
+    const t500=polys.reduce((a,r)=>a+(r.cx_500||0),0);
+    const t1k=polys.reduce((a,r)=>a+(r.cx_1000||0),0);
+    const t2k=polys.reduce((a,r)=>a+(r.cx_2000||0),0);
+    linhas.push('  📌 *Total: '+(t310+t500+t1k+t2k)+' caixas*');
+    if(t310)linhas.push('  • 310L → '+t310+' cx');
+    if(t500)linhas.push('  • 500L → '+t500+' cx');
+    if(t1k)linhas.push('  • 1.000L → '+t1k+' cx');
+    if(t2k)linhas.push('  • 2.000L → '+t2k+' cx');
+    ['MaxFort','KEP'].forEach(function(m){var v=polys.filter(function(r){return r.maquina===m;}).reduce(function(a,r){return a+(r.total_cx||0);},0);if(v)linhas.push('  _('+m+': '+v+' cx)_');});
+    var mat=polys.reduce(function(a,r){return a+(r.mat_kg||0);},0);
+    var desp=polys.reduce(function(a,r){return a+(r.desp_kg||0);},0);
+    var pint=polys.reduce(function(a,r){return a+(r.pintura||0);},0);
+    var av=polys.reduce(function(a,r){return a+(r.avaria_qtd||0);},0);
+    if(mat)linhas.push('  🏭 Material: '+mat+' kg');
+    if(desp)linhas.push('  ♻️ Desp: '+desp+' kg');
+    if(pint)linhas.push('  🎨 Pintura: '+pint+' cx');
+    if(av)linhas.push('  ⚠️ Avaria: '+av+' cx');
+    linhas.push('');
+  }
+  if(fibras.length){
+    linhas.push('🏗️ *FIBRA*');
+    var tCx=fibras.reduce(function(a,r){return a+(r.qtd||0);},0);
+    var tMu=fibras.reduce(function(a,r){return a+(r.multi_qtd||0);},0);
+    linhas.push('  📌 *Total: '+(tCx+tMu)+' peças*');
+    var prods={};
+    fibras.forEach(function(r){
+      if(r.produto&&r.qtd){var k=r.produto+' ('+r.tipo_prod+')';prods[k]=(prods[k]||0)+r.qtd;}
+      if(r.multi_prod&&r.multi_qtd){prods[r.multi_prod]=(prods[r.multi_prod]||0)+r.multi_qtd;}
+    });
+    Object.entries(prods).filter(function(e){return e[1]>0;}).forEach(function(e){linhas.push('  • '+e[0]+': '+e[1]+' un');});
+    var despFb=fibras.reduce(function(a,r){return a+(r.desp_kg||0);},0);
+    var pintFb=fibras.reduce(function(a,r){return a+(r.pintura||0);},0);
+    var avFb=fibras.reduce(function(a,r){return a+(r.avaria_qtd||0);},0);
+    if(despFb)linhas.push('  ♻️ Desp: '+despFb+' kg');
+    if(pintFb)linhas.push('  🎨 Pintura: '+pintFb+' un');
+    if(avFb)linhas.push('  ⚠️ Avaria: '+avFb+' un');
+    linhas.push('');
+  }
+  if(pts.length){
+    linhas.push('🚿 *PIAS E TANQUES*');
+    var totPT=pts.reduce(function(a,r){return a+(r.qtd||0);},0);
+    linhas.push('  📌 *Total: '+totPT+' peças*');
+    linhas.push('  *Por cor:*');
+    ['Branco','Bege','Cinza','Preto'].forEach(function(cor){
+      var v=pts.filter(function(r){return r.cor===cor;}).reduce(function(a,r){return a+(r.qtd||0);},0);
+      if(v)linhas.push('  • '+cor+': '+v+' un');
+    });
+    linhas.push('  *Por modelo:*');
+    var mods={};
+    pts.forEach(function(r){if(r.produto)mods[r.produto]=(mods[r.produto]||0)+(r.qtd||0);});
+    Object.entries(mods).filter(function(e){return e[1]>0;}).forEach(function(e){linhas.push('  • '+e[0]+': '+e[1]+' un');});
+    var areiaT=pts.reduce(function(a,r){return a+(r.areia_kg||0);},0);
+    var rovingT=pts.reduce(function(a,r){return a+(r.roving_kg||0);},0);
+    var resinT=pts.reduce(function(a,r){return a+(r.resina_un||0);},0);
+    var despPT=pts.reduce(function(a,r){return a+(r.desp_kg||0);},0);
+    var avPT=pts.reduce(function(a,r){return a+(r.avaria_qtd||0);},0);
+    if(areiaT)linhas.push('  🏭 Areia: '+areiaT+' kg');
+    if(rovingT)linhas.push('  🏭 Roving: '+rovingT+' kg');
+    if(resinT)linhas.push('  🏭 Resina 3100: '+resinT+' un');
+    if(despPT)linhas.push('  ♻️ Desp: '+despPT+' kg');
+    if(avPT)linhas.push('  ⚠️ Avaria: '+avPT+' un');
+    linhas.push('');
+  }
+  var totPint=Object.values(filaPintura).reduce(function(a,b){return a+b;},0);
+  if(totPint>0){
+    linhas.push('🎨 *PINTURA — FILA ATUAL*');
+    linhas.push('  📌 *Aguardando: '+totPint+' caixas*');
+    Object.entries(filaPintura).filter(function(e){return e[1]>0;}).forEach(function(e){linhas.push('  • '+e[0]+': '+e[1]+' cx');});
+    linhas.push('');
+  }
+  if(maqs.length){
+    linhas.push('⚡ *MÁQUINAS*');
+    maqs.forEach(function(r){linhas.push('  • '+(r.maquina_sel||'')+'('+r.turno+'): '+r.prod_kg+' kg · '+r.vazao_min+' kg/min');});
+    linhas.push('');
+  }
+  var gasUlt=gases.length?gases[gases.length-1]:null;
+  if(gasUlt){
+    linhas.push('🔥 *CENTRAL DE GÁS*');
+    var vals=[gasUlt.t3093,gasUlt.t3095,gasUlt.t3096,gasUlt.t13595];
+    var media=Math.round(vals.reduce(function(a,b){return a+b;},0)/4);
+    linhas.push('  📌 *Média: '+media+'%*');
+    linhas.push('  • 3093: '+gasUlt.t3093+'%'+(gasUlt.t3093<30?' ⚠️':''));
+    linhas.push('  • 3095: '+gasUlt.t3095+'%'+(gasUlt.t3095<30?' ⚠️':''));
+    linhas.push('  • 3096: '+gasUlt.t3096+'%'+(gasUlt.t3096<30?' ⚠️':''));
+    linhas.push('  • 13595: '+gasUlt.t13595+'%'+(gasUlt.t13595<30?' ⚠️':''));
+    linhas.push('');
+  }
+  var emRota=FROTA_COMPLETA.filter(function(v){return veiculosStatus[v]==='Em Rota';});
+  var emManut=FROTA_COMPLETA.filter(function(v){return veiculosStatus[v]==='Manutenção';});
+  if(emRota.length||emManut.length){
+    linhas.push('🚛 *CARREGAMENTO*');
+    var disp=FROTA_COMPLETA.length-emRota.length-emManut.length;
+    linhas.push('  • Disponíveis: '+disp);
+    if(emRota.length){linhas.push('  • Em rota ('+emRota.length+'):');emRota.forEach(function(v){linhas.push('    ↗ '+(v.split('·')[1]||v).trim());});}
+    if(emManut.length){linhas.push('  • Manutenção ('+emManut.length+'):');emManut.forEach(function(v){linhas.push('    🔧 '+(v.split('·')[1]||v).trim());});}
+    linhas.push('');
+  }
+  if(estmps.length){
+    linhas.push('📦 *ESTOQUE MPs — HOJE*');
+    estmps.forEach(function(r){linhas.push('  '+(r.tipo_mov==='Entrada'?'▲':'▼')+' '+r.mp+': '+r.qtd+' '+r.un);});
+    linhas.push('');
+  }
+  linhas.push('═══════════════════════');
+  linhas.push('_Enviado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'_');
+  linhas.push('_PCP Mestre — Controle de Produção_');
+  var msg=linhas.join('\n');
+  window.open('https://wa.me/'+WPP_FIXO+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══ NAVEGAÇÃO ══
+function openForm(id){
+  if(id==='dashboard'&&usuarioAtual!=='Wendel'){showToast('Acesso apenas para Wendel','err');return;}
+  document.getElementById('home').style.display='none';
+  document.querySelectorAll('.form-screen').forEach(f=>f.classList.remove('active'));
+  document.getElementById('form-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='pintura') renderPintura();
+  if(id==='dashboard') renderDashboard();
+  if(id==='carga') renderFrotaSelect();
+  if(id==='saved') renderSaved();
+  if(id==='estmp') renderEstmpHist();
+  if(id==='maquinas') renderMaqForm();
+  if(id==='estprod') renderProdSelect();
+}
+
+function goHome(){
+  document.querySelectorAll('.form-screen').forEach(f=>f.classList.remove('active'));
+  document.getElementById('home').style.display='flex';
+  atualizarBadges();
+}
+
+function renderEstmpHist(){
+  const hist=document.getElementById('estmp-hist');
+  if(!hist)return;
+  const movs=registros.filter(r=>r.setor==='estmp').slice(-6).reverse();
+  if(!movs.length){hist.innerHTML='<div style="padding:10px 14px;color:var(--text2);font-size:12px">Nenhuma movimentação hoje.</div>';return;}
+  hist.innerHTML=movs.map(r=>`<div class="dash-row"><span class="dash-label">${r.mp}</span><span class="dash-value ${r.tipo_mov==='Entrada'?'ok':'danger'}">${r.tipo_mov==='Entrada'?'+':'-'}${r.qtd} ${r.un}</span></div>`).join('');
+}
+
+const setorColors={poly:'#58A6FF',fibra:'#3FB950',pt:'#D2A8FF',pintura:'#FF9900',maquinas:'#F0B429',gas:'#FF7B72',carga:'#79C0FF',estmp:'#D2A8FF',estprod:'#3FB950',dashboard:'#F0B429'};
+const setorNames={poly:'Polietileno',fibra:'Fibra',pt:'Pias/Tanques',pintura:'Pintura',maquinas:'Máquinas',gas:'Gás',carga:'Carregamento',estmp:'Estoque MP',estprod:'Estoque Produtos',dashboard:'Dashboard'};
+
+function renderSaved(){
+  const list=document.getElementById('saved-list');
+  document.getElementById('saved-subtitle').textContent=registros.length+' registro(s)';
+  if(!registros.length){list.innerHTML='<div style="padding:30px;text-align:center;color:var(--text2)">Nenhum registro hoje.</div>';return;}
+  list.innerHTML=registros.slice().reverse().map(r=>{
+    const cor=setorColors[r.setor]||'#888';
+    const nome=setorNames[r.setor]||r.setor;
+    let resumo='';
+    if(r.setor==='poly')resumo=`${r.turno}·${r.maquina} ${r.carro}·${r.total_cx||0} cx`;
+    else if(r.setor==='fibra')resumo=`${r.turno}·${r.produto||''}·${r.qtd||0} un`;
+    else if(r.setor==='pt')resumo=`${r.turno}·${r.produto||''} ${r.cor||''}·${r.qtd||0} un`;
+    else if(r.setor==='maquinas')resumo=`${r.maquina_sel}·${r.turno}·${r.prod_kg} kg`;
+    else if(r.setor==='gas')resumo=`3093:${r.t3093}% 3095:${r.t3095}% 3096:${r.t3096}% 13595:${r.t13595}%`;
+    else if(r.setor==='carga')resumo=`${r.veiculo||''}·${r.status||''}`;
+    else if(r.setor==='estmp')resumo=`${r.tipo_mov}·${r.mp}·${r.qtd} ${r.un}`;
+    else if(r.setor==='estprod')resumo=`${r.tipo_mov}·${r.produto||''}·${r.qtd} un`;
+    else if(r.setor==='pintura')resumo=`Baixa·${r.produto||''}·${r.qtd_pintada||0} cx`;
+    const syncIcon=r.enviado?'<span style="color:#2EA043;font-size:10px">✓ Sheets</span>':'<span style="color:#F0B429;font-size:10px">⏳ Pendente</span>';
+    return`<div class="saved-item"><div class="saved-header"><div class="saved-title" style="color:${cor}">${nome}</div><div class="saved-time">${r.hora||''}</div></div><div class="saved-body">${resumo}</div><div style="margin-top:3px">${syncIcon}</div></div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
